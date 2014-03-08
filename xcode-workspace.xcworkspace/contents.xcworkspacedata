@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:start_livestream.sh">
+   </FileRef>
+   <Group
+      location = "group:src"
+      name = "src">
+   </Group>
+   <Group
+      location = "group:third_party"
+      name = "third_party">
+   </Group>
+   <Group
+      location = "group:etc"
+      name = "etc">
+   </Group>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+</Workspace>

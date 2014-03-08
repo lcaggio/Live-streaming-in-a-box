@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>BF384E2A-F09A-4C40-A87D-31A4058189FD</string>
+	<key>IDESourceControlProjectName</key>
+	<string>xcode-workspace</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</key>
+		<string>ssh://github.com/lcaggio/Live-streaming-in-a-box.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>xcode-workspace.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/lcaggio/Live-streaming-in-a-box.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Live-streaming-in-a-box</string>
+		</dict>
+	</array>
+</dict>
+</plist>
