@@ -12,6 +12,145 @@
       </FileRef>
    </Group>
    <Group
+      location = "group:lib"
+      name = "lib">
+      <Group
+         location = "group:livebox"
+         name = "livebox">
+         <FileRef
+            location = "group:api.py">
+         </FileRef>
+         <FileRef
+            location = "group:webserver.py">
+         </FileRef>
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:apiclient"
+         name = "apiclient">
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+         <FileRef
+            location = "group:discovery.py">
+         </FileRef>
+         <FileRef
+            location = "group:errors.py">
+         </FileRef>
+         <FileRef
+            location = "group:http.py">
+         </FileRef>
+         <FileRef
+            location = "group:mimeparse.py">
+         </FileRef>
+         <FileRef
+            location = "group:model.py">
+         </FileRef>
+         <FileRef
+            location = "group:push.py">
+         </FileRef>
+         <FileRef
+            location = "group:schema.py">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:gflags.py">
+      </FileRef>
+      <FileRef
+         location = "group:gflags_validators.py">
+      </FileRef>
+      <Group
+         location = "group:httplib2"
+         name = "httplib2">
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+         <FileRef
+            location = "group:__init__.pyc">
+         </FileRef>
+         <FileRef
+            location = "group:cacerts.txt">
+         </FileRef>
+         <FileRef
+            location = "group:iri2uri.py">
+         </FileRef>
+         <FileRef
+            location = "group:iri2uri.pyc">
+         </FileRef>
+         <FileRef
+            location = "group:socks.py">
+         </FileRef>
+         <FileRef
+            location = "group:socks.pyc">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:oauth2client"
+         name = "oauth2client">
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+         <FileRef
+            location = "group:anyjson.py">
+         </FileRef>
+         <FileRef
+            location = "group:appengine.py">
+         </FileRef>
+         <FileRef
+            location = "group:client.py">
+         </FileRef>
+         <FileRef
+            location = "group:clientsecrets.py">
+         </FileRef>
+         <FileRef
+            location = "group:crypt.py">
+         </FileRef>
+         <FileRef
+            location = "group:django_orm.py">
+         </FileRef>
+         <FileRef
+            location = "group:file.py">
+         </FileRef>
+         <FileRef
+            location = "group:gce.py">
+         </FileRef>
+         <FileRef
+            location = "group:keyring_storage.py">
+         </FileRef>
+         <FileRef
+            location = "group:locked_file.py">
+         </FileRef>
+         <FileRef
+            location = "group:multistore_file.py">
+         </FileRef>
+         <FileRef
+            location = "group:tools.py">
+         </FileRef>
+         <FileRef
+            location = "group:util.py">
+         </FileRef>
+         <FileRef
+            location = "group:xsrfutil.py">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:uritemplate"
+         name = "uritemplate">
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+      </Group>
+   </Group>
+   <Group
+      location = "group:etc"
+      name = "etc">
+      <FileRef
+         location = "group:client_secrets.json">
+      </FileRef>
+   </Group>
+   <Group
       location = "group:third_party"
       name = "third_party">
       <Group

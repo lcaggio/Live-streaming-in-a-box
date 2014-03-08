@@ -22,13 +22,13 @@ from oauth2client import file as oauth2_file
 from oauth2client import tools as oauth2_tools
 
 # local imports
-import webserver, api
+from livebox import webserver, api
 
 # constants
 ROOT_PATH = os.path.join(src_path,"..")
 CLIENT_SECRETS_FILE = os.path.join(ROOT_PATH,"etc","client_secrets.json")
 TOKEN_STORAGE = os.path.join(ROOT_PATH,"etc","oauth2.json")
-WEBROOT_PATH = os.path.normpath(os.path.join(ROOT_PATH,"www"))
+WEBROOT_PATH = os.path.normpath(os.path.join(ROOT_PATH,"etc","www"))
 MIMETYPES_PATH = os.path.join(ROOT_PATH,"etc","mime.types")
 YOUTUBE_SCOPES = [
 	"https://www.googleapis.com/auth/youtube",
