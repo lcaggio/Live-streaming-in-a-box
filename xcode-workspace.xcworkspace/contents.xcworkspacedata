@@ -7,10 +7,120 @@
    <Group
       location = "group:src"
       name = "src">
+      <FileRef
+         location = "group:webserver.py">
+      </FileRef>
    </Group>
    <Group
       location = "group:third_party"
       name = "third_party">
+      <Group
+         location = "group:raspicam"
+         name = "raspicam">
+         <FileRef
+            location = "group:CMakeLists.txt">
+         </FileRef>
+         <FileRef
+            location = "group:Doxyfile">
+         </FileRef>
+         <Group
+            location = "group:gl_scenes"
+            name = "gl_scenes">
+            <FileRef
+               location = "group:cube_texture_and_coords.h">
+            </FileRef>
+            <FileRef
+               location = "group:mirror.c">
+            </FileRef>
+            <FileRef
+               location = "group:mirror.h">
+            </FileRef>
+            <FileRef
+               location = "group:models.c">
+            </FileRef>
+            <FileRef
+               location = "group:models.h">
+            </FileRef>
+            <FileRef
+               location = "group:sobel.c">
+            </FileRef>
+            <FileRef
+               location = "group:sobel.h">
+            </FileRef>
+            <FileRef
+               location = "group:square.c">
+            </FileRef>
+            <FileRef
+               location = "group:square.h">
+            </FileRef>
+            <FileRef
+               location = "group:teapot.c">
+            </FileRef>
+            <FileRef
+               location = "group:teapot.h">
+            </FileRef>
+            <FileRef
+               location = "group:yuv.c">
+            </FileRef>
+            <FileRef
+               location = "group:yuv.h">
+            </FileRef>
+         </Group>
+         <FileRef
+            location = "group:Makefile">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiCamControl.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiCamControl.h">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiCamDocs.odt">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiCLI.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiCLI.h">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiPreview.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiPreview.h">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiStill.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiStillYUV.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiTex.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiTex.h">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiTexUtil.c">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiTexUtil.h">
+         </FileRef>
+         <FileRef
+            location = "group:RaspiVid.c">
+         </FileRef>
+         <FileRef
+            location = "group:README.md">
+         </FileRef>
+         <FileRef
+            location = "group:tga.c">
+         </FileRef>
+         <FileRef
+            location = "group:tga.h">
+         </FileRef>
+      </Group>
    </Group>
    <Group
       location = "group:etc"
