@@ -10,7 +10,7 @@ mkfifo "$fifo"
 raspivid \
  -fps 25 -g 50 \
  -w 1280 -h 720 \
- -t 0 -b 500000 -o "$fifo" &
+ -t 0 -b 400000 -o "$fifo" &
 
 ffmpeg -y \
  -i "$fifo" \
@@ -18,13 +18,15 @@ ffmpeg -y \
  -i /dev/zero \
  -vcodec copy \
  -acodec libfaac \
- -r 25 \
+ -r 50 \
  -b:v 4M \
- -g 50 \ -s 1280x720 \
+ -g 50 \ 
+ -s 1280x720 \
  -keyint_min 50 \
  -ac 2 \
  -ar 44100 \
- -ab 64k \
- -vb 500k \
+ -ab 128k \
+ -f h264 \
+ -strict experimental \
  -c:v copy \
  -f flv $url
