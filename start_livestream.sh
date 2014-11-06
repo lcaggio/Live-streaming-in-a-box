@@ -1,6 +1,6 @@
 #!/bin/bash
 
-url="rtmp://a.rtmp.youtube.com/live2/<STREAM NAME HERE>"
+url="rtmp://a.rtmp.youtube.com/live2/<STREAM_NAME_HERE>"
 fifo="live.fifo.h264.youtube"
 
 rm -f "$fifo"
@@ -12,7 +12,7 @@ raspivid \
  -w 1280 -h 720 \
  -t 0 -b 400000 -o "$fifo" &
 
-ffmpeg -y \
+ffmpeg \
  -i "$fifo" \
  -f s16le \
  -i /dev/zero \
@@ -20,7 +20,7 @@ ffmpeg -y \
  -acodec libfaac \
  -r 50 \
  -b:v 4M \
- -g 50 \ 
+ -g 50 \
  -s 1280x720 \
  -keyint_min 50 \
  -ac 2 \
