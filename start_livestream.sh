@@ -1,6 +1,7 @@
 #!/bin/bash
 
-url="rtmp://a.rtmp.youtube.com/live2/<STREAM_NAME_HERE>"
+echo $1
+url="rtmp://a.rtmp.youtube.com/live2/$1"
 fifo="live.fifo.h264.youtube"
 
 rm -f "$fifo"
