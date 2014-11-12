@@ -1,0 +1,13 @@
+{
+  "name": "cors-upload-sample",
+  "homepage": "https://github.com/jeffposnick/cors-upload-sample",
+  "_release": "2f47880877",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "2f4788087720bf665acd550f665e36b699b3e8bb"
+  },
+  "_source": "git://github.com/jeffposnick/cors-upload-sample.git",
+  "_target": "master",
+  "_originalSource": "jeffposnick/cors-upload-sample"
+}
