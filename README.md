@@ -29,13 +29,13 @@ to stream directly from your camera to YouTube. You can use this as follows:
 ```
 
 In this example, you stream from the camera to a YouTube stream using the 360p
-resolution. The command line arguments are as follows:
+resolution. The command line arguments are as follows, with some examples:
 
   * `--verbose` Will show more output on the console
   * `--resolution 240p | 360p | 480p | 720p | 1080p` The resolution of the broadcast to send
   * `--audio silence | 1kHz` Whether to send a 1kHz tone or silence as the audio track
   * `--fps 15 | 25 | 30` The framerate to use
-  * `--bitrate 800kpbs 1M etc.` The bitrate to use
+  * `--bitrate 800kpbs | 1M | 100000` The bitrate to use
   
 The only required argument is the URL, but it's also worth setting the resolution
 argument to ensure you're sending the right quality.
