@@ -24,16 +24,22 @@
          location = "group:livebox"
          name = "livebox">
          <FileRef
-            location = "group:constants.py">
-         </FileRef>
-         <FileRef
-            location = "group:api.py">
+            location = "group:streamer.py">
          </FileRef>
          <FileRef
             location = "group:camera.py">
          </FileRef>
          <FileRef
+            location = "group:api.py">
+         </FileRef>
+         <FileRef
+            location = "group:constants.py">
+         </FileRef>
+         <FileRef
             location = "group:webserver.py">
+         </FileRef>
+         <FileRef
+            location = "group:util.py">
          </FileRef>
          <FileRef
             location = "group:__init__.py">
@@ -59,111 +65,110 @@
    <Group
       location = "group:third_party"
       name = "third_party">
+      <FileRef
+         location = "group:gflags_validators.py">
+      </FileRef>
+      <FileRef
+         location = "group:gflags.py">
+      </FileRef>
       <Group
-         location = "group:raspicam"
-         name = "raspicam">
+         location = "group:apiclient"
+         name = "apiclient">
          <FileRef
-            location = "group:CMakeLists.txt">
+            location = "group:errors.py">
          </FileRef>
          <FileRef
-            location = "group:Doxyfile">
-         </FileRef>
-         <Group
-            location = "group:gl_scenes"
-            name = "gl_scenes">
-            <FileRef
-               location = "group:cube_texture_and_coords.h">
-            </FileRef>
-            <FileRef
-               location = "group:mirror.c">
-            </FileRef>
-            <FileRef
-               location = "group:mirror.h">
-            </FileRef>
-            <FileRef
-               location = "group:models.c">
-            </FileRef>
-            <FileRef
-               location = "group:models.h">
-            </FileRef>
-            <FileRef
-               location = "group:sobel.c">
-            </FileRef>
-            <FileRef
-               location = "group:sobel.h">
-            </FileRef>
-            <FileRef
-               location = "group:square.c">
-            </FileRef>
-            <FileRef
-               location = "group:square.h">
-            </FileRef>
-            <FileRef
-               location = "group:teapot.c">
-            </FileRef>
-            <FileRef
-               location = "group:teapot.h">
-            </FileRef>
-            <FileRef
-               location = "group:yuv.c">
-            </FileRef>
-            <FileRef
-               location = "group:yuv.h">
-            </FileRef>
-         </Group>
-         <FileRef
-            location = "group:Makefile">
+            location = "group:schema.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiCamControl.c">
+            location = "group:http.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiCamControl.h">
+            location = "group:model.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiCamDocs.odt">
+            location = "group:discovery.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiCLI.c">
+            location = "group:mimeparse.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiCLI.h">
+            location = "group:push.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiPreview.c">
+            location = "group:__init__.py">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:httplib2"
+         name = "httplib2">
+         <FileRef
+            location = "group:socks.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiPreview.h">
+            location = "group:cacerts.txt">
          </FileRef>
          <FileRef
-            location = "group:RaspiStill.c">
+            location = "group:__init__.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiStillYUV.c">
+            location = "group:iri2uri.py">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:oauth2client"
+         name = "oauth2client">
+         <FileRef
+            location = "group:clientsecrets.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiTex.c">
+            location = "group:locked_file.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiTex.h">
+            location = "group:file.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiTexUtil.c">
+            location = "group:gce.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiTexUtil.h">
+            location = "group:keyring_storage.py">
          </FileRef>
          <FileRef
-            location = "group:RaspiVid.c">
+            location = "group:anyjson.py">
          </FileRef>
          <FileRef
-            location = "group:README.md">
+            location = "group:client.py">
          </FileRef>
          <FileRef
-            location = "group:tga.c">
+            location = "group:util.py">
          </FileRef>
          <FileRef
-            location = "group:tga.h">
+            location = "group:appengine.py">
+         </FileRef>
+         <FileRef
+            location = "group:multistore_file.py">
+         </FileRef>
+         <FileRef
+            location = "group:crypt.py">
+         </FileRef>
+         <FileRef
+            location = "group:xsrfutil.py">
+         </FileRef>
+         <FileRef
+            location = "group:tools.py">
+         </FileRef>
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+         <FileRef
+            location = "group:django_orm.py">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:uritemplate"
+         name = "uritemplate">
+         <FileRef
+            location = "group:__init__.py">
          </FileRef>
       </Group>
    </Group>
