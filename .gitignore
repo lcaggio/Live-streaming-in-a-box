@@ -13,6 +13,8 @@ profile
 *.mode2v3
 *.perspectivev3
 *.pyc
+._*
+
 #    NB: also, whitelist the default ones, some projects need to use these
 !default.pbxuser
 !default.mode1v3
