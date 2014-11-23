@@ -12,9 +12,8 @@ Prerequisite
 ------------
 
  * A Raspberry Pi + Pi Cam
- * Raspberry Pi connected to internet (wifi or ethernet)
+ * Internet connection (wifi or ethernet)
  * The Raspian operating system (probably) with Python 2.7 and picamera installed
- * ffmpeg installed (a version of which is included in this package)
 
 Installation
 ------------
