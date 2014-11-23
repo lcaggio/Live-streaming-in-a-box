@@ -20,7 +20,7 @@ CAMERA_RESOLUTION = (
 CAMERA_PROFILE = ("main","high","baseline","constrained") # first is the default
 CAMERA_FORMAT = "h264"
 CAMERA_FRAMERATE = 25
-CAMERA_QUALITY = 40
+CAMERA_QUALITY = None
 
 """ Streamer constants """
 STREAMER_EXEC = "bin/ffmpeg"

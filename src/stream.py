@@ -12,6 +12,7 @@
 	  --resolution 240p | 360p | 480p | 720p | 1080p
 	  --audio silence | 1kHz
 	  --fps 15 | 25 | 30
+	  --quality 10-40
 	  --bitrate 800kpbs 1M etc.
 """
 
@@ -54,6 +55,7 @@ gflags.DEFINE_string('resolution',livebox.constants.CAMERA_RESOLUTION[0][0],"Cam
 gflags.DEFINE_integer('fps',livebox.constants.CAMERA_FRAMERATE,"Frames per second")
 gflags.DEFINE_string('bitrate',None,"Video bitrate")
 gflags.DEFINE_string('audio',livebox.constants.STREAMER_AUDIO[0][0],"Audio channel content")
+gflags.DEFINE_integer('quality',livebox.constants.CAMERA_QUALITY,"Camera quality parameter")
 
 ################################################################################
 # application classes
@@ -83,7 +85,7 @@ class FIFO(object):
 			raise Error(e)
 
 class Application(object):
-	def __init__(self,argv,package_path=None,resolution=None,framerate=None,bitrate=None,audio=None):
+	def __init__(self,argv,package_path=None,resolution=None,framerate=None,bitrate=None,audio=None,quality=None):
 		assert isinstance(argv,list)
 		assert isinstance(resolution,tuple)
 		assert isinstance(audio,tuple)
@@ -95,6 +97,7 @@ class Application(object):
 		self.framerate = framerate
 		self.resolution = resolution
 		self.audio = audio
+		self.quality = quality
 		if bitrate:
 			self.bitrate = bitrate
 		self.url = argv[1]
@@ -168,6 +171,13 @@ class Application(object):
 		return self._framerate
 	framerate = property(get_framerate,set_framerate)
 
+	def set_quality(self,value):
+		assert value==None or (isinstance(value,int) and value > 0)
+		self._quality = value
+	def get_quality(self):
+		return self._quality
+	quality = property(get_quality,set_quality)
+
 	def set_bitrate(self,value):
 		assert isinstance(value,(int,long,basestring))
 		self._bitrate = self.parse_bitrate(value)
@@ -194,11 +204,11 @@ class Application(object):
 		return [tuple[0] for tuple in livebox.constants.STREAMER_AUDIO]
 
 	def run(self):
-		logging.info("RUNNING resolution=%s fps=%s bitrate=%s audio=%s" % (self.resolution,self.framerate,self.bitrate,self.audio))
+		logging.info("RUNNING resolution=%s fps=%s bitrate=%s quality=%s audio=%s" % (self.resolution,self.framerate,self.bitrate,self.quality,self.audio))
 		
 		# create a FIFO object
 		output = FIFO()
-		camera_thread = threading.Thread(target=self.camera.capture,args=(output.filename,self.framesize,self.framerate,self.bitrate))
+		camera_thread = threading.Thread(target=self.camera.capture,args=(output.filename,self.framesize,self.framerate,self.bitrate,self.quality))
 		streamer_thread = threading.Thread(target=self.streamer.stream,args=(output.filename,self.framerate,self.bitrate,self.url))
 
 		camera_thread.daemon = True
@@ -248,10 +258,8 @@ def main(argv):
 			raise Error("Invalid argument: --bitrate")
 		
 		# Create application
-		application = Application(argv,package_path=root_path,resolution=resolution_tuple,framerate=FLAGS.fps,bitrate=FLAGS.bitrate,audio=audio_tuple)
-		
+		application = Application(argv,package_path=root_path,resolution=resolution_tuple,framerate=FLAGS.fps,bitrate=FLAGS.bitrate,audio=audio_tuple,quality=FLAGS.quality)
 		application.run()
-		
 		sys.exit(0)
 	except (Error, gflags.FlagsError), e:
 		print "Usage error: %s" % e

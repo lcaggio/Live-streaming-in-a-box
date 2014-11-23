@@ -23,11 +23,11 @@ class Camera(object):
 	def __init__(self):
 		self.running = False
 
-	def capture(self,filename=None,framesize=None,framerate=constants.CAMERA_FRAMERATE,bitrate=None,profile=constants.CAMERA_PROFILE[0],quality=constants.CAMERA_QUALITY):
+	def capture(self,filename=None,framesize=None,framerate=constants.CAMERA_FRAMERATE,bitrate=None,quality=constants.CAMERA_QUALITY,profile=constants.CAMERA_PROFILE[0]):
 		assert isinstance(filename,basestring) and filename
 		assert isinstance(framesize,tuple) and len(framesize)==2
 		assert isinstance(framerate,int) and framerate > 0
-		assert isinstance(quality,int) and quality > 0
+		assert quality==None or (isinstance(quality,int) and quality > 0)
 		assert isinstance(profile,basestring) and profile in constants.CAMERA_PROFILE
 		assert bitrate==None or (isinstance(bitrate,(int,long)) and bitrate > 0)
 
