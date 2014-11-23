@@ -27,11 +27,46 @@ for path in code_paths:
 import time
 
 # Third party imports
-import picamera
+import gflags
 
-with picamera.PiCamera() as camera:
-    camera.resolution = (640, 480)
-    camera.start_recording('foo.h264')
-    camera.wait_recording(60)
-    camera.stop_recording()
+# Local imports
+import livebox.constants
+import livebox.camera
 
+# command line flags
+FLAGS = gflags.FLAGS
+gflags.DEFINE_boolean('verbose',False,"Verbose output")
+gflags.DEFINE_string('stream',None,"YouTube Stream Name")
+
+class Application(object):
+	def __init__(self,argv):
+		assert isinstance(argv,list)
+		pass
+	def run(self):
+		logging.info("RUNNING")
+		pass
+
+################################################################################
+# main method
+
+def main(argv):
+	try:
+		argv = FLAGS(argv)
+		
+		# set logging verbosity level
+		if FLAGS.verbose:
+			logging.basicConfig(level=logging.DEBUG)
+		else:
+			logging.basicConfig(level=logging.INFO)
+
+		# Create application and run it
+		application = Application(argv)
+		application.run()
+		
+		sys.exit(0)
+	except gflags.FlagsError, e:
+		print "Usage error: %s" % e
+		sys.exit(-1)
+
+if __name__ == "__main__":
+	main(sys.argv)
