@@ -10,29 +10,29 @@
 	<string>xcode-workspace</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</key>
+		<key>E14EB37C75EFA7EDAC8EF9BB787AE0EB3313B2F2</key>
 		<string>ssh://github.com/lcaggio/Live-streaming-in-a-box.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>xcode-workspace.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</key>
+		<key>E14EB37C75EFA7EDAC8EF9BB787AE0EB3313B2F2</key>
 		<string>..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>ssh://github.com/lcaggio/Live-streaming-in-a-box.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</string>
+	<string>E14EB37C75EFA7EDAC8EF9BB787AE0EB3313B2F2</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>6DAF9EC2-BDFB-4A1E-A58F-6F11780FC1FC</string>
+			<string>E14EB37C75EFA7EDAC8EF9BB787AE0EB3313B2F2</string>
 			<key>IDESourceControlWCCName</key>
 			<string>Live-streaming-in-a-box</string>
 		</dict>
