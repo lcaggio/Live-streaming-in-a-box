@@ -69,7 +69,7 @@ The server-version of the software needs to be installed instead of the command-
 version. The way to start the server version is as follows:
 
 ```
- python src/server.py --bind localhost --port 8000 --mdns
+ python src/server.py --bind localhost --port 8000 --mdns --docroot <document root>
 ```
 
 The server can be bound to the local interface (thus preventing access via the
