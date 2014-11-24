@@ -65,8 +65,8 @@ Server Usage
 
 TODO
 
-The server-version of the software needs to be installed instead of the command-line
-version. The way to start the server version is as follows:
+The server-version of the software provides a way to stream from the Raspberry Pi
+via non-command line interfaces. The way to start the server version is as follows:
 
 ```
  python src/server.py --bind localhost --port 8000 --mdns --docroot <document root>
@@ -89,7 +89,7 @@ There is no security considered yet. Ideally, we can introduce some sort of auth
 later. This would be important due to the potentially sensitive nature of what is being
 streamed!
 
-Here is what the general response might look like:
+Here is what the current status response might look like:
 
 ```
 {
