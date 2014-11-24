@@ -122,6 +122,9 @@ You can POST control data or GET it. In either case, it will return the
 control data back again. To start or stop the streaming, PUT that, and
 it will return a OK or Bad Request status depending on whether that's possible.
 
+There is also a generic webserver which will return anything under the document
+root, as long as the files fetched aren't under the "api" namespace.
+
 TODO
 ----
 
