@@ -89,6 +89,39 @@ There is no security considered yet. Ideally, we can introduce some sort of auth
 later. This would be important due to the potentially sensitive nature of what is being
 streamed!
 
+Here is what the general response might look like:
+
+```
+{
+  "product": "com.youtube.livebox",
+  "version": "1.0",
+  "name": "rpi2.nw1", // hostname or name set otherwise
+  "id": "XXXXXXXXX",  // MAC address
+  "status": "idle",   // idle, preparing, streaming, stopping
+  "cpu": 32.0,        // CPU percentage used by the software
+  "disk": 76.0,       // Temporary storage used in percentage
+  "net": 290000       // Outgress in bytes
+}
+```
+
+Here is what a control message looks like:
+
+```
+{
+	"name": "djt.zepf-h0qx-1z8d-821q",
+	"url": "rtmp://a.rtmp.youtube.com/live2",
+	"resolution": "360p",
+	"bitrate": 100000,
+	"audio": "1kHz",
+	"fps": 25,
+	"quality": null // use default
+}
+```
+
+You can POST control data or GET it. In either case, it will return the
+control data back again. To start or stop the streaming, PUT that, and
+it will return a OK or Bad Request status depending on whether that's possible.
+
 TODO
 ----
 
