@@ -89,4 +89,16 @@ There is no security considered yet. Ideally, we can introduce some sort of auth
 later. This would be important due to the potentially sensitive nature of what is being
 streamed!
 
+TODO
+----
+
+Other things to consider:
+
+  * Want to be able to store logs and data in an sqlite database, which can be
+    accessed and analysed later, via the API
+  * Authorization and authentication to be done in the API for network connections,
+    probably not so necessary on the localhost interface.
+  * Have a reliable channel for accessing the remote location to pull down commands
+    and return responses. Look here for example: http://schibum.blogspot.co.uk/2011/06/using-google-appengine-channel-api-with.html
+	
 
