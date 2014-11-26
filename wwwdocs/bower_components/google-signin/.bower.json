@@ -1,13 +1,14 @@
 {
   "name": "google-signin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Web components to authenticate with Google services",
   "homepage": "http://googlewebcomponents.github.io/google-signin",
   "main": "google-signin.html",
   "authors": [
-    "Addy Osmani"
+    "Addy Osmani",
+    "Randy Merrill"
   ],
-  "license": "Apache2",
+  "license": "Apache-2",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -21,23 +22,28 @@
     "web-components",
     "polymer",
     "sign-in",
-    "google"
+    "google",
+    "authentication"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~0.4.0",
-    "google-apis": "GoogleWebComponents/google-apis#~0.3.2",
-    "core-signals": "Polymer/core-signals#~0.4.0",
-    "paper-focusable": "Polymer/paper-focusable#~0.4.0",
-    "paper-ripple": "Polymer/paper-ripple#~0.4.0",
-    "font-roboto": "Polymer/font-roboto#~0.4.0"
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-icon": "Polymer/core-icon#~0.5.1",
+    "core-icons": "Polymer/core-icons#~0.5.1",
+    "core-signals": "Polymer/core-signals#~0.5.1",
+    "font-roboto": "Polymer/font-roboto#~0.5.1",
+    "google-apis": "GoogleWebComponents/google-apis#~0.4.2",
+    "paper-button": "Polymer/paper-button#~0.5.1",
+    "paper-ripple": "Polymer/paper-ripple#~0.5.1",
+    "paper-shadow": "Polymer/paper-shadow#~0.5.1"
   },
-  "_release": "0.1.0",
+  "_release": "0.2.0",
   "_resolution": {
     "type": "version",
-    "tag": "v0.1.0",
-    "commit": "25a4cb02440ffd47028ff9cf5b6ef9eb53c9089e"
+    "tag": "v0.2.0",
+    "commit": "205845eff4a2f54f4d3dbe4e42c4eaf45b8a4df0"
   },
-  "_source": "git://github.com/GoogleWebComponents/google-signin.git",
-  "_target": "~0.1.0",
-  "_originalSource": "GoogleWebComponents/google-signin"
+  "_source": "git://github.com/addyosmani/google-signin.git",
+  "_target": "~0.2.0",
+  "_originalSource": "google-signin",
+  "_direct": true
 }

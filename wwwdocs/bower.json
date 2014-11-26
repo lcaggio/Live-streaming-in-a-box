@@ -1,14 +1,8 @@
 {
-  "name": "ytlive",
+  "name": "livebox",
   "version": "0.0.1",
   "authors": [
-    "Lorenzo Caggioni <lcaggioni@google.com>"
-  ],
-  "main": "index.html",
-  "keywords": [
-    "youtube",
-    "livestreaming",
-    "api"
+    "lorenzo.caggioni@gmail.com"
   ],
   "license": "MIT",
   "private": true,
@@ -20,8 +14,8 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~0.4.2",
-    "core-elements": "Polymer/core-elements#~0.4.2",
-    "paper-elements": "Polymer/paper-elements#~0.4.2"
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-elements": "Polymer/core-elements#~0.5.1",
+    "paper-elements": "Polymer/paper-elements#~0.5.1"
   }
 }
