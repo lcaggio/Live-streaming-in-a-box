@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 1. Load platform support before any code that touches the DOM. -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <!-- 2. Load the component using an HTML Import -->
+    <link rel="import" href="elements/my-element.html">
+	
+<link rel="import" 
+  href="bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" 
+  href="bower_components/core-menu/core-menu.html">
+<link rel="import" 
+  href="bower_components/core-item/core-item.html">
+<link rel="import" 
+  href="bower_components/core-header-panel/core-header-panel.html">
+<link rel="import" 
+  href="bower_components/core-drawer-panel/core-drawer-panel.html">
+<link rel="import" 
+  href="bower_components/core-scaffold/core-scaffold.html">	
+<link rel="import" 
+  href="bower_components/sampler-scaffold/sampler-scaffold.html">	  
+  
+ <style>
+
+   body {
+     font-family: sans-serif;
+     color: #333;
+     margin: 0;
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+     -webkit-tap-highlight-color: rgba(0,0,0,0);
+     -webkit-touch-callout: none;
+   }
+
+ </style> 
+</head>
+<body unresolved>
+
+	<sampler-scaffold label="Raspberry live box" fit>
+	  	<core-item label="WiFi contifuration" tag="pi-configuration" url="wifi-configuration.html"></core-item>
+		<core-item label="Livestreaming" tag="pi-live" url="/google-youtube-livestreaming/demo.html"></core-item>
+	</sampler-scaffold>	
+	
+</body>
+</html>
