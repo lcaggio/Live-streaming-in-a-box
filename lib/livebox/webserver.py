@@ -7,7 +7,7 @@ import urlparse,socket,os,logging,json
 import datetime
 
 # local imports
-from . import constants
+from . import constants,util
 
 ################################################################################
 
@@ -197,7 +197,8 @@ class APIRequest(Request):
 			"version": constants.PRODUCT_VERSION,
 			"timestamp": datetime.datetime.now().isoformat(),
 			"name": self.server.server_name,
-			"status": "idle"
+			"status": "idle",
+			"system": util.system_info()
 		}
 
 	def handler_shutdown(self):

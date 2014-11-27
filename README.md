@@ -7,7 +7,7 @@ Description
 This is a package to live stream from your Raspberry Pi and Camera to YouTube,
 which can be controlled from a web-based interface, essentially turning your 
 Raspberry Pi into a "Livestreaming in a Box" solution!
-
+ 
 Prerequisite
 ------------
 
