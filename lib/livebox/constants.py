@@ -33,3 +33,6 @@ STREAMER_AUDIO_BITRATE = "64k"
 """ FIFO NAME """
 FIFO_NAME = "camera.h264.fifo"
 
+""" Network constants """
+NETWORK_PORT = 8080
+

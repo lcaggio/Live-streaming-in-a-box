@@ -14,12 +14,16 @@
 	  --fps 15 | 25 | 30
 	  --quality 10-40
 	  --bitrate 800kpbs 1M etc.
+	  
+	Please see https://github.com/lcaggio/Live-streaming-in-a-box for full
+	documentation.
+
 """
 
 __author__ = "davidthorpe@google.com (David Thorpe)"
 
 # python imports
-import os,sys,logging,tempfile
+import os,sys
 
 # add python libraries:
 # 'lib' for shared modules
@@ -36,6 +40,7 @@ for path in code_paths:
 # imports
 
 # Python imports
+import logging,tempfile
 import time,stat,re,threading
 
 # Third party imports
