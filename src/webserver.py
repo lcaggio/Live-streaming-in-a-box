@@ -42,23 +42,23 @@ for path in code_paths:
 # Python imports
 import logging,tempfile
 import time,stat,re,threading
-from BaseHTTPServer import HTTPServer,BaseHTTPRequestHandler
 
 # Third party imports
 import gflags
 
 # Local imports
 import livebox.constants
+import livebox.webserver
 
 ################################################################################
 # command line flags
 
 FLAGS = gflags.FLAGS
 gflags.DEFINE_boolean('verbose',False,"Verbose output")
-gflags.DEFINE_string('bind',"","Network interface to bind to")
+gflags.DEFINE_string('bind',livebox.constants.NETWORK_BIND,"Network interface or *")
 gflags.DEFINE_integer('port',livebox.constants.NETWORK_PORT,"Network port")
 gflags.DEFINE_boolean('mdns',True,"Broadcast service availability on network")
-gflags.DEFINE_string('docroot',None,"Web document folder")
+gflags.DEFINE_string('wwwroot',os.path.join(root_path,"wwwdocs"),"Web document folder")
 gflags.DEFINE_string('temproot',None,"Temporary file storage folder")
 
 ################################################################################
@@ -67,16 +67,15 @@ gflags.DEFINE_string('temproot',None,"Temporary file storage folder")
 class Error(Exception):
 	pass
 
-class Handler(BaseHTTPRequestHandler):
-	pass
-
-class Application(HTTPServer):
-	def __init__(self,bind,port):
-		HTTPServer.__init__(self,(bind,port),Handler)
+class Application(object):
+	def __init__(self,bind,port,wwwroot):
+		try:
+			self._server = livebox.webserver.Server(bind,port,wwwroot)
+		except livebox.webserver.Error, e:
+			raise Error(e)
 
 	def run(self):
-		while True:
-			self.handle_request()
+		self._server.run()
 
 ################################################################################
 # main method
@@ -92,9 +91,15 @@ def main(argv):
 			logging.basicConfig(level=logging.INFO)
 
 		# Check input arguments
+		if FLAGS.bind=="*":
+			FLAGS.bind = ""
+		if FLAGS.port < 1:
+			raise Error("Invalid --port parameter")
+		if not os.path.isdir(FLAGS.wwwroot):
+			raise Error("Invalid --wwwroot parameter")
 		
 		# Create application
-		app = Application(FLAGS.bind,FLAGS.port)
+		app = Application(FLAGS.bind,FLAGS.port,FLAGS.wwwroot)
 
 		# run application
 		app.run()

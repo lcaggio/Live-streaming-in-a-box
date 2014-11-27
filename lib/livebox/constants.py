@@ -34,5 +34,29 @@ STREAMER_AUDIO_BITRATE = "64k"
 FIFO_NAME = "camera.h264.fifo"
 
 """ Network constants """
+NETWORK_BIND = "*"
 NETWORK_PORT = 8080
+NETWORK_BASEPATH_API = "/api/"
+
+""" HTTP Status codes """
+HTTP_STATUS_OK = 200
+HTTP_STATUS_BADREQUEST = 400
+HTTP_STATUS_NOTFOUND = 404
+HTTP_STATUS_AUTHREQUIRED = 401
+HTTP_STATUS_SERVERERROR = 500
+
+""" Mimetypes """
+HTTP_INDEX_FILENAME = "index.html"
+HTTP_MIMETYPES = (
+	("","application/octet-stream"), # Default
+	(".html","text/html"),
+	(".txt","text/plain"),
+	(".css","text/css"),
+	(".js","application/javascript"),
+	(".json","application/json"),
+	(".png","image/png"),
+	(".jpg","image/jpeg"),
+	(".gif","image/gif"),
+	(".ico","image/x-icon"),
+)
 

@@ -1,3 +1,121 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# python imports
+from BaseHTTPServer import HTTPServer,BaseHTTPRequestHandler
+import urlparse,socket,time,os,logging
+
+# local imports
+from . import constants
+
+################################################################################
+
+class Error(Exception):
+	def __init__(self,reason,code=constants.HTTP_STATUS_SERVERERROR):
+		assert isinstance(reason,basestring) and reason
+		assert isinstance(code,(int,long)) and code
+		Exception.__init__(self,reason)
+		self._reason = reason
+		self._code = code
+	
+	@property
+	def reason(self):
+		return self._reason
+	@property
+	def code(self):
+		return self._code
+	def __str__(self):
+		return "%s (Error: %s)" % (self.reason,self.code)
+
+class Server(HTTPServer):
+	def __init__(self,bind,port,wwwroot):
+		assert isinstance(bind,basestring)
+		assert isinstance(port,(int,long)) and port > 0
+		assert isinstance(wwwroot,basestring) and os.path.isdir(wwwroot)
+
+		try:
+			HTTPServer.__init__(self,(bind,port),Request)
+		except socket.error, e:
+			raise Error("Server bind error: %s" % e)
+
+		self.running = False
+		self.wwwroot = wwwroot
+		self.mimetypes = dict(constants.HTTP_MIMETYPES)
+	
+	""" PROPERTIES """
+	def set_running(self,value):
+		assert isinstance(value,bool)
+		self._running = value
+	def get_running(self):
+		return self._running
+	running = property(get_running,set_running)
+	
+	def set_wwwroot(self,value):
+		assert isinstance(value,basestring) and value and os.path.isdir(value)
+		self._wwwroot = value
+	def get_wwwroot(self):
+		return self._wwwroot
+	wwwroot = property(get_wwwroot,set_wwwroot)
+	
+	
+	""" METHODS """
+	def get_mimetype(self,filename):
+		(r,ext) = os.path.splitext(filename)
+		return self.mimetypes.get(ext,self.mimetypes.get(""))
+	
+	def run(self):
+		self.running = True
+		while self.running:
+			self.handle_request()
+
+################################################################################
+
+class Request(BaseHTTPRequestHandler):
+
+	def do_GET(self):
+		try:
+			path = urlparse.urlparse(self.path)
+
+			""" Handle API calls """
+			if path.path.startswith(constants.NETWORK_BASEPATH_API):
+				return self.do_request_api(path)
+
+			""" Handle static files """
+			absolute_path = os.path.normpath(os.path.join(self.server.wwwroot,path.path.strip('/')))
+			if not absolute_path.startswith(self.server.wwwroot):
+				raise Error("Bad request: %s" % path.path,constants.HTTP_STATUS_BADREQUEST)
+			if not os.path.exists(absolute_path):
+				raise Error("Not Found: %s" % path.path,constants.HTTP_STATUS_NOTFOUND)
+
+			""" Deal with index files """
+			if os.path.isfile(absolute_path):
+				pass
+			elif os.path.isdir(absolute_path):
+				absolute_path = os.path.join(absolute_path,constants.HTTP_INDEX_FILENAME)
+
+			""" Don't allow hidden files, get mimetype """
+			(_,filename) = os.path.split(absolute_path)
+			if filename.startswith("."):
+				raise Error("Bad request: %s" % path.path,constants.HTTP_STATUS_BADREQUEST)
+			mimetype = self.server.get_mimetype(filename)
+
+			""" Do logging """
+			logging.debug("%s => filename: %s mimetype: %s" % (path.path,filename,mimetype))
+
+			""" Send static file response """
+			self.send_response(200)
+			self.send_header('Content-type',mimetype)
+			self.send_header('Date', self.date_time_string())
+			self.send_header('Last-Modified',self.date_time_string(os.stat(absolute_path).st_mtime))
+			self.end_headers()
+			with open(absolute_path,"rb") as filehandle:
+				self.wfile.write(filehandle.read())
+		except Error, e:
+			self.send_error(e.code,e.reason)
+
+
+################################################################################
+
 
 # python imports
 import re, os, json
