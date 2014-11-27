@@ -7,6 +7,9 @@
 """
 __author__ = "davidthorpe@google.com (David Thorpe)"
 
+PRODUCT_NAME = "com.google.youtube.livebox"
+PRODUCT_VERSION = 0.1
+
 """ Default camera resolutions and bitrates """
 CAMERA_RESOLUTION = (
 	("360p",640,360,"750kbps"),

@@ -63,27 +63,42 @@ argument to ensure you're sending the right quality.
 Server Usage
 ------------
 
-TODO
-
 The server-version of the software provides a way to stream from the Raspberry Pi
-via non-command line interfaces. The way to start the server version is as follows:
+via non-command line interfaces. The way to start the server version is (for
+example) as follows:
 
 ```
- python src/server.py --bind localhost --port 8000 --mdns --docroot <document root>
+ python src/webserver.py --port 8000
 ```
 
 The server can be bound to the local interface (thus preventing access via the
-network) or to a particular network interface. You set the port to listen to API
-incoming commands. The API format for version 1 is as follows:
+network) or to a particular network interface. The command line switches are as
+follows:
 
-   * `GET /api/livebox/v1/status` Returns a JSON structure which reports the current
+  * `--port 8000` Set the port number to listen for incoming connections on
+  
+  * `--bind * | localhost` Listen to all interfaces or only some interfaces. By
+    setting this to `localhost` you can ensure that only processes on the device
+	itself can send API commands.
+	
+  * `--wwwdocs <folder>` You can set a custom folder to use as the static files
+    that can be served by the server. In general, you won't want to set this.
+
+  * `--verbose` Reports more information on the console than usual, for debugging
+    purposes.
+
+The API format for version 1 is as follows:
+
+   * `GET /api/v1/status` Returns a JSON structure which reports the current
 	 status of the livebox. It reports whether the streamer is on or off, and the CPU
 	 and network loads.
+
+   * `GET /api/v1/shutdown` Stops the server and returns to the command prompt.
 	 
-   * `GET|POST /api/livebox/v1/control` Get control data for the current live stream,
+   * `GET|POST /api/livebox/v1/control` TODO Get control data for the current live stream,
 	 or alter the parameters.
 	 
-   * `PUT /api/livebox/v1/(start|stop)` Start or stop streaming
+   * `PUT /api/livebox/v1/(start|stop)` TODO Start or stop streaming
    
 There is no security considered yet. Ideally, we can introduce some sort of authentication
 later. This would be important due to the potentially sensitive nature of what is being

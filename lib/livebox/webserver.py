@@ -3,7 +3,8 @@
 
 # python imports
 from BaseHTTPServer import HTTPServer,BaseHTTPRequestHandler
-import urlparse,socket,time,os,logging,json
+import urlparse,socket,os,logging,json
+import datetime
 
 # local imports
 from . import constants
@@ -78,12 +79,10 @@ class Request(BaseHTTPRequestHandler):
 	METHOD_PUT = 2
 	METHOD_POST = 3
 	METHOD_DELETE = 4
-
-	def __init__(self,*args):
-		BaseHTTPRequestHandler.__init__(self,*args)
-		self.json_response = False # Error response in JSON format?
 	
 	def handler(self,method,path):
+		self.json_response = False # Normal error response
+		
 		""" Only allow GET requests """
 		if method != Request.METHOD_GET:
 			raise Error("Bad request: %s" % path.path,constants.HTTP_STATUS_BADREQUEST)
@@ -115,8 +114,11 @@ class Request(BaseHTTPRequestHandler):
 		self.send_header('Date', self.date_time_string())
 		self.send_header('Last-Modified',self.date_time_string(os.stat(absolute_path).st_mtime))
 		self.end_headers()
-		with open(absolute_path,"rb") as filehandle:
-			self.wfile.write(filehandle.read())
+		try:
+			with open(absolute_path,"rb") as filehandle:
+				self.wfile.write(filehandle.read())
+		except IOError, e:
+			raise Error("IOError")
 
 	def send_error(self,code,reason):
 		if not self.json_response:
@@ -191,17 +193,19 @@ class APIRequest(Request):
 
 	def handler_status(self):
 		return {
+			"product": constants.PRODUCT_NAME,
+			"version": constants.PRODUCT_VERSION,
+			"timestamp": datetime.datetime.now().isoformat(),
 			"name": self.server.server_name,
-			"port": self.server.server_port,
-			"version": 1.0
+			"status": "idle"
 		}
 
-	def handler_stop(self):
+	def handler_shutdown(self):
 		self.server.running = False
 
 	ROUTES = (
-		(Request.METHOD_GET,"status",handler_status),
-		(Request.METHOD_GET,"stop",handler_stop),
+		(Request.METHOD_GET,"v1/status",handler_status),
+		(Request.METHOD_GET,"v1/shutdown",handler_shutdown),
 	)
 
 
