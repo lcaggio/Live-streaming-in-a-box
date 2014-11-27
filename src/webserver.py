@@ -56,9 +56,8 @@ FLAGS = gflags.FLAGS
 gflags.DEFINE_boolean('verbose',False,"Verbose output")
 gflags.DEFINE_string('bind',livebox.constants.NETWORK_BIND,"Network interface or *")
 gflags.DEFINE_integer('port',livebox.constants.NETWORK_PORT,"Network port")
-gflags.DEFINE_boolean('mdns',True,"Broadcast service availability on network")
 gflags.DEFINE_string('wwwroot',os.path.join(root_path,"wwwdocs"),"Web document folder")
-gflags.DEFINE_string('temproot',None,"Temporary file storage folder")
+#gflags.DEFINE_string('temproot',None,"Temporary file storage folder")
 
 ################################################################################
 # application classes
