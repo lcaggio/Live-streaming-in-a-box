@@ -138,3 +138,16 @@ Other things to consider:
     and return responses. Look here for example: http://schibum.blogspot.co.uk/2011/06/using-google-appengine-channel-api-with.html
 	
 
+TEMP
+----
+Solution with 2 wifi adapters. 
+ - wlan1: fixed SSID to always access the pi and configure wlan0
+ - wlan0: configurable wifi
+To use the UI, you need to:
+ - apt-get install lighttpd php5-cgi
+ - sudo lighty-enable-mod fastcgi-php
+ - /etc/init.d/lighttpd restart
+ - Add to /etc/sudoers the following: www-data ALL=(ALL) NOPASSWD:/sbin/ifdown wlan0,/sbin/ifup wlan0,/bin/cat /etc/wpa_supplicant/wpa_supplicant.conf,/bin/cp /tmp/wifidata /etc/wpa_supplicant/wpa_supplicant.conf,/sbin/wpa_cli scan_results,/sbin/wpa_cli scan
+
+Inspired by: http://sirlagz.net/2013/02/06/script-web-configuration-page-for-raspberry-pi/
+
