@@ -40,8 +40,7 @@ for path in code_paths:
 # imports
 
 # Python imports
-import logging,tempfile
-import time,stat,re,threading
+import logging,urlparse
 
 # Third party imports
 import gflags
@@ -74,6 +73,10 @@ class Application(object):
 		except livebox.webserver.Error, e:
 			raise Error(e)
 
+	@property
+	def server_url(self):
+		return urlparse.urlunparse(("http","%s:%s" % (self._server.server_name,self._server.server_port),"/",None,None,None))
+
 	def run(self):
 		self._server.run()
 
@@ -102,6 +105,7 @@ def main(argv):
 		app = Application(FLAGS.bind,FLAGS.port,FLAGS.wwwroot)
 
 		# run application
+		logging.info("Serving on %s" % app.server_url)
 		app.run()
 
 		sys.exit(0)

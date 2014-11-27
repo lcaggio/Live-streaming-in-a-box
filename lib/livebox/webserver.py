@@ -72,6 +72,53 @@ class Server(HTTPServer):
 
 class Request(BaseHTTPRequestHandler):
 
+	def do_request_api(self,path):
+		self.send_response(200)
+		self.send_header('Content-type',"application/json")
+		self.send_header('Date', self.date_time_string())
+		self.end_headers()
+		self.wfile.write(path)
+
+	def do_POST(self):
+		try:
+			path = urlparse.urlparse(self.path)
+
+			""" Handle API calls """
+			if path.path.startswith(constants.NETWORK_BASEPATH_API):
+				return self.do_request_api(path)
+
+			""" Return bad request """
+			raise Error("Bad request: %s" % path.path,constants.HTTP_STATUS_BADREQUEST)
+		except Error,e:
+			self.send_error(e.code,e.reason)
+
+
+	def do_PUT(self):
+		try:
+			path = urlparse.urlparse(self.path)
+
+			""" Handle API calls """
+			if path.path.startswith(constants.NETWORK_BASEPATH_API):
+				return self.do_request_api(path)
+
+			""" Return bad request """
+			raise Error("Bad request: %s" % path.path,constants.HTTP_STATUS_BADREQUEST)
+		except Error,e:
+			self.send_error(e.code,e.reason)
+
+	def do_DELETE(self):
+		try:
+			path = urlparse.urlparse(self.path)
+
+			""" Handle API calls """
+			if path.path.startswith(constants.NETWORK_BASEPATH_API):
+				return self.do_request_api(path)
+
+			""" Return bad request """
+			raise Error("Bad request: %s" % path.path,constants.HTTP_STATUS_BADREQUEST)
+		except Error,e:
+			self.send_error(e.code,e.reason)
+
 	def do_GET(self):
 		try:
 			path = urlparse.urlparse(self.path)
@@ -110,6 +157,7 @@ class Request(BaseHTTPRequestHandler):
 			self.end_headers()
 			with open(absolute_path,"rb") as filehandle:
 				self.wfile.write(filehandle.read())
+			
 		except Error, e:
 			self.send_error(e.code,e.reason)
 
