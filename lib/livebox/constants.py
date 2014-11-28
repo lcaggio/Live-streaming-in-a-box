@@ -7,6 +7,7 @@
 """
 __author__ = "davidthorpe@google.com (David Thorpe)"
 
+""" Product information """
 PRODUCT_NAME = "com.google.youtube.livebox"
 PRODUCT_VERSION = 0.1
 
