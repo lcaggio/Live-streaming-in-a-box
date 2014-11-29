@@ -95,10 +95,10 @@ The API format for version 1 is as follows:
 
    * `GET /api/v1/shutdown` Stops the server and returns to the command prompt.
 	 
-   * `GET|POST /api/livebox/v1/control` TODO Get control data for the current live stream,
+   * `GET|PUT|POST /api/v1/control` Get control data for the current live stream,
 	 or alter the parameters.
 	 
-   * `PUT /api/livebox/v1/(start|stop)` TODO Start or stop streaming
+   * `GET /api/v1/(start|stop)` Start or stop streaming
    
 There is no security considered yet. Ideally, we can introduce some sort of authentication
 later. This would be important due to the potentially sensitive nature of what is being
@@ -127,14 +127,15 @@ Here is what a control message looks like:
 	"url": "rtmp://a.rtmp.youtube.com/live2",
 	"resolution": "360p",
 	"bitrate": 100000,
+	"video": "picamera",
 	"audio": "1kHz",
 	"fps": 25,
 	"quality": null // use default
 }
 ```
 
-You can POST control data or GET it. In either case, it will return the
-control data back again. To start or stop the streaming, PUT that, and
+You can POST or PUT control data or GET it. In either case, it will return the
+control data back again. To start or stop the streaming, GET that, and
 it will return a OK or Bad Request status depending on whether that's possible.
 
 There is also a generic webserver which will return anything under the document
@@ -151,7 +152,9 @@ Other things to consider:
     probably not so necessary on the localhost interface.
   * Have a reliable channel for accessing the remote location to pull down commands
     and return responses. Look here for example: http://schibum.blogspot.co.uk/2011/06/using-google-appengine-channel-api-with.html
-	
+  * Want to be able to output to a file on temporary storage, or loop video/audio input from
+    a file in temporary storage for output.
+
 
 TEMP
 ----
