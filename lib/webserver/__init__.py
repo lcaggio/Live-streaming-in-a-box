@@ -59,49 +59,6 @@ class Error(Exception):
 
 ################################################################################
 
-class Server(HTTPServer):
-	def __init__(self,bind,port,wwwroot):
-		assert isinstance(bind,basestring)
-		assert isinstance(port,(int,long)) and port > 0
-		assert isinstance(wwwroot,basestring) and os.path.isdir(wwwroot)
-
-		try:
-			HTTPServer.__init__(self,(bind,port),APIRequest)
-		except socket.error, e:
-			raise Error("Server bind error: %s" % e)
-
-		self.running = False
-		self.wwwroot = wwwroot
-		self.mimetypes = dict(HTTP_MIMETYPES)
-	
-	""" PROPERTIES """
-	def set_running(self,value):
-		assert isinstance(value,bool)
-		self._running = value
-	def get_running(self):
-		return self._running
-	running = property(get_running,set_running)
-	
-	def set_wwwroot(self,value):
-		assert isinstance(value,basestring) and value and os.path.isdir(value)
-		self._wwwroot = value
-	def get_wwwroot(self):
-		return self._wwwroot
-	wwwroot = property(get_wwwroot,set_wwwroot)
-	
-	
-	""" METHODS """
-	def get_mimetype(self,filename):
-		(r,ext) = os.path.splitext(filename)
-		return self.mimetypes.get(ext,self.mimetypes.get(""))
-	
-	def run(self):
-		self.running = True
-		while self.running:
-			self.handle_request()
-
-################################################################################
-
 class Request(BaseHTTPRequestHandler):
 	
 	def handler(self,method,path):
@@ -191,3 +148,47 @@ class Request(BaseHTTPRequestHandler):
 			return self.handler(HTTP_METHOD_GET,urlparse.urlparse(self.path))
 		except Error,e:
 			self.send_error(e.code,e.reason)
+
+################################################################################
+
+class Server(HTTPServer):
+	def __init__(self,bind,port,wwwroot,request_class=Request):
+		assert isinstance(bind,basestring)
+		assert isinstance(port,(int,long)) and port > 0
+		assert isinstance(wwwroot,basestring) and os.path.isdir(wwwroot)
+
+		try:
+			HTTPServer.__init__(self,(bind,port),request_class)
+		except socket.error, e:
+			raise Error("Server bind error: %s" % e)
+
+		self.running = False
+		self.wwwroot = wwwroot
+		self.mimetypes = dict(HTTP_MIMETYPES)
+	
+	""" PROPERTIES """
+	def set_running(self,value):
+		assert isinstance(value,bool)
+		self._running = value
+	def get_running(self):
+		return self._running
+	running = property(get_running,set_running)
+	
+	def set_wwwroot(self,value):
+		assert isinstance(value,basestring) and value and os.path.isdir(value)
+		self._wwwroot = value
+	def get_wwwroot(self):
+		return self._wwwroot
+	wwwroot = property(get_wwwroot,set_wwwroot)
+	
+	
+	""" METHODS """
+	def get_mimetype(self,filename):
+		(r,ext) = os.path.splitext(filename)
+		return self.mimetypes.get(ext,self.mimetypes.get(""))
+	
+	def run(self):
+		self.running = True
+		while self.running:
+			self.handle_request()
+

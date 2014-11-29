@@ -8,15 +8,11 @@ import datetime
 import cgi
 
 # local imports
-from webserver import Request
+import webserver
 from . import constants,util
 from . import Control
 
 ################################################################################
-
-class APIServer(webserver.Server):
-	pass
-
 
 class APIRequest(webserver.Request):
 
@@ -39,7 +35,7 @@ class APIRequest(webserver.Request):
 		api_path = path.path[len(constants.NETWORK_BASEPATH_API):]
 		api_route = self.get_route(method,api_path)
 		if not api_route:
-			raise Error("Not Found: %s" % path.path,webserver.HTTP_STATUS_NOTFOUND)
+			raise webserver.Error("Not Found: %s" % path.path,webserver.HTTP_STATUS_NOTFOUND)
 		
 		""" Obtain the body """
 		args = ()
@@ -65,7 +61,7 @@ class APIRequest(webserver.Request):
 	
 	def handler_put_control(self,body):
 		if not isinstance(body,dict):
-			raise Error("Invalid control information",webserver.HTTP_STATUS_BADREQUEST)
+			raise webserver.Error("Invalid control information",webserver.HTTP_STATUS_BADREQUEST)
 
 		# Test properties
 		for control in (Control(),self.server.control):
@@ -79,15 +75,15 @@ class APIRequest(webserver.Request):
 					assert hasattr(control,key)
 					setattr(control,key,value)
 				except (AssertionError,ValueError):
-					raise Error("Invalid value for '%s'" % key,webserver.HTTP_STATUS_BADREQUEST)
+					raise webserver.Error("Invalid value for '%s'" % key,webserver.HTTP_STATUS_BADREQUEST)
 		# Return the control structure
 		return self.server.control.as_json()
 
-	def handler_start_streamer(self,body):
+	def handler_start_streamer(self):
 		""" Start streaming from the camera """
 		self.server.streamer_start()
 
-	def handler_stop_streamer(self,body):
+	def handler_stop_streamer(self):
 		""" Stop streaming from the camera """
 		self.server.streamer_stop()
 
@@ -105,12 +101,27 @@ class APIRequest(webserver.Request):
 		self.server.running = False
 
 	ROUTES = (
-		(Request.METHOD_GET,"v1/status",handler_status),
-		(Request.METHOD_GET,"v1/shutdown",handler_shutdown),
-		(Request.METHOD_GET,"v1/control",handler_get_control),
-		(Request.METHOD_PUT,"v1/control",handler_put_control),
-		(Request.METHOD_POST,"v1/control",handler_put_control),
-		(Request.METHOD_PUT,"v1/start",handler_start_streamer),
-		(Request.METHOD_PUT,"v1/stop",handler_stop_streamer),
+		(webserver.HTTP_METHOD_GET,"v1/status",handler_status),
+		(webserver.HTTP_METHOD_GET,"v1/shutdown",handler_shutdown),
+		(webserver.HTTP_METHOD_GET,"v1/control",handler_get_control),
+		(webserver.HTTP_METHOD_PUT,"v1/control",handler_put_control),
+		(webserver.HTTP_METHOD_POST,"v1/control",handler_put_control),
+		(webserver.HTTP_METHOD_GET,"v1/start",handler_start_streamer),
+		(webserver.HTTP_METHOD_GET,"v1/stop",handler_stop_streamer),
 	)
+
+################################################################################
+
+class APIServer(webserver.Server):
+	def __init__(self,*args):
+		webserver.Server.__init__(self,*args,request_class=APIRequest)
+		self.control = Control()
+
+	def streamer_start(self):
+		pass
+
+	def streamer_stop(self):
+		pass
+
+
 

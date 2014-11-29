@@ -67,10 +67,7 @@ class Error(Exception):
 
 class Application(livebox.api.APIServer):
 	def __init__(self,bind,port,wwwroot):
-		try:
-			livebox.api.APIServer.__init__(self,bind,port,wwwroot)
-		except livebox.webserver.Error, e:
-			raise Error(e)
+		livebox.api.APIServer.__init__(self,bind,port,wwwroot)
 
 	@property
 	def server_url(self):
