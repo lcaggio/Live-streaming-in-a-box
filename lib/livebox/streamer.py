@@ -17,12 +17,12 @@ from . import constants
 # Streamer class
 
 class Streamer(object):
-	def __init__(self,ffmpeg=None,audio_flags=None):
+	def __init__(self,ffmpeg=None):
 		assert isinstance(ffmpeg,basestring) and ffmpeg
 		assert os.path.exists(ffmpeg) and os.path.isfile(ffmpeg)
-		assert isinstance(audio_flags,tuple)
+		#assert isinstance(audio_flags,tuple)
 		self._ffmpeg = ffmpeg
-		self._audio_flags = audio_flags
+		self._audio_flags = "" # audio_flags
 		self.running = False
 		self._queue = Queue.Queue()
 	

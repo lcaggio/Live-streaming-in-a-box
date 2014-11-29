@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Python imports
-import os,re
-import datetime
+import os,re,tempfile,datetime
 
 # Local imports
 from . import constants
@@ -29,6 +28,29 @@ def system_info():
 	return {
 		"cpu": cpu
 	}
+
+################################################################################
+
+class FIFO(object):
+	""" Create and maintain a FIFO file """
+	def __init__(self,filename=constants.FIFO_NAME):
+		self._temp_path = tempfile.mkdtemp()
+		self._fifo_path = os.path.join(self._temp_path,filename)
+		try:
+			os.mkfifo(self._fifo_path)
+		except OSError, e:
+			raise Error(e)
+
+	@property
+	def filename(self):
+		return self._fifo_path
+
+	def close(self):
+		try:
+			os.remove(self._fifo_path)
+			os.rmdir(self._temp_path)
+		except OSError, e:
+			raise Error(e)
 
 ################################################################################
 
@@ -66,3 +88,11 @@ def get_bitrate_for_resolution(value):
 		if tuple[0]==value:
 			return tuple[3]
 	return None
+
+def get_framesize_for_resolution(value):
+	for tuple in constants.CAMERA_RESOLUTION:
+		if tuple[0]==value:
+			return (tuple[1],tuple[2])
+	return None
+
+

@@ -98,7 +98,10 @@ class Control(object):
 	framerate = property(get_framerate,set_framerate)
 
 	def get_quality(self):
-		return self._quality
+		if self._quality:
+			return self._quality
+		else:
+			return None
 	def set_quality(self,value):
 		assert value==None or isinstance(value,(int,long,basestring))
 		quality = None

@@ -9,7 +9,7 @@ import cgi
 
 # local imports
 import webserver
-from . import constants,util
+import camera,streamer,constants,util
 from . import Control
 
 ################################################################################
@@ -26,7 +26,7 @@ class APIRequest(webserver.Request):
 
 	def handler(self,method,path):
 		if not path.path.startswith(constants.NETWORK_BASEPATH_API):
-			return Request.handler(self,method,path)
+			return webserver.Request.handler(self,method,path)
 	
 		""" Respond with JSON """
 		self.json_response = True
@@ -113,14 +113,44 @@ class APIRequest(webserver.Request):
 ################################################################################
 
 class APIServer(webserver.Server):
-	def __init__(self,*args):
+	def __init__(self,package_path,*args):
 		webserver.Server.__init__(self,*args,request_class=APIRequest)
 		self.control = Control()
+		self.fifo = util.FIFO()
+		self.camera = camera.Camera()
+		self.streamer = streamer.Streamer(ffmpeg=os.path.join(package_path,constants.STREAMER_EXEC))
+
+	def run(self):
+		logging.debug("run(): starting runloop, fifo=%s" % self.fifo.filename)
+		webserver.Server.run(self)
+		self.fifo.close()
+		logging.debug("run(): stopped runloop")
+
+	def camera_start(self):
+		logging.debug("Starting camera")
+		try:
+			self.camera.start(
+				filename=self.fifo.filename,
+				framesize=util.get_framesize_for_resolution(self.control.resolution),
+				framerate=self.control.framerate,
+				bitrate=self.control.bitrate,
+				quality=self.control.quality
+			)
+		except camera.Error, e:
+			raise webserver.Error("%s" % e,webserver.HTTP_STATUS_SERVERERROR)
+
+	def camera_stop(self):
+		try:
+			self.camera.stop()
+		except camera.Error, e:
+			raise webserver.Error("%s" % e,webserver.HTTP_STATUS_SERVERERROR)
 
 	def streamer_start(self):
+		self.camera_start()
 		pass
 
 	def streamer_stop(self):
+		self.camera_stop()
 		pass
 
 

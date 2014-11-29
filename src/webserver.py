@@ -67,7 +67,7 @@ class Error(Exception):
 
 class Application(livebox.api.APIServer):
 	def __init__(self,bind,port,wwwroot):
-		livebox.api.APIServer.__init__(self,bind,port,wwwroot)
+		livebox.api.APIServer.__init__(self,root_path,bind,port,wwwroot)
 
 	@property
 	def server_url(self):
