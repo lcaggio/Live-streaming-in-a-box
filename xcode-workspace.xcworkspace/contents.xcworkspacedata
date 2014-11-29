@@ -18,6 +18,13 @@
       location = "group:lib"
       name = "lib">
       <Group
+         location = "group:webserver"
+         name = "webserver">
+         <FileRef
+            location = "group:__init__.py">
+         </FileRef>
+      </Group>
+      <Group
          location = "group:livebox"
          name = "livebox">
          <FileRef
@@ -31,9 +38,6 @@
          </FileRef>
          <FileRef
             location = "group:constants.py">
-         </FileRef>
-         <FileRef
-            location = "group:webserver.py">
          </FileRef>
          <FileRef
             location = "group:util.py">

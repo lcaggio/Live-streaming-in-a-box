@@ -27,7 +27,11 @@ CAMERA_FRAMERATE = 25
 CAMERA_QUALITY = None
 
 """ Streamer constants """
+STREAMER_URL_SCHEMES = ("rtmp",)
 STREAMER_EXEC = "bin/ffmpeg"
+STREAMER_VIDEO = (
+	("picamera",None),
+)
 STREAMER_AUDIO = (
 	("1kHz","-f lavfi","-i \"sine=frequency=1000:duration=0\""),
 	("silence","-ar 44100","-ac 2","-acodec pcm_s16le","-f s16le","-ac 2","-i /dev/zero"),
@@ -41,27 +45,4 @@ FIFO_NAME = "camera.h264.fifo"
 NETWORK_BIND = "*"
 NETWORK_PORT = 8080
 NETWORK_BASEPATH_API = "/api/"
-
-""" HTTP Status codes """
-HTTP_STATUS_OK = 200
-HTTP_STATUS_NOCONTENT = 204
-HTTP_STATUS_BADREQUEST = 400
-HTTP_STATUS_NOTFOUND = 404
-HTTP_STATUS_AUTHREQUIRED = 401
-HTTP_STATUS_SERVERERROR = 500
-
-""" Mimetypes """
-HTTP_INDEX_FILENAME = "index.html"
-HTTP_MIMETYPES = (
-	("","application/octet-stream"), # Default
-	(".html","text/html"),
-	(".txt","text/plain"),
-	(".css","text/css"),
-	(".js","application/javascript"),
-	(".json","application/json"),
-	(".png","image/png"),
-	(".jpg","image/jpeg"),
-	(".gif","image/gif"),
-	(".ico","image/x-icon"),
-)
 

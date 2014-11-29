@@ -1,82 +1,112 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-# Google API imports
-from oauth2client import client as oauth2_client
-import httplib2
-from apiclient import discovery as apiclient_discovery
+# python imports
+from BaseHTTPServer import HTTPServer,BaseHTTPRequestHandler
+import urlparse,socket,os,logging,json
+import datetime
+import cgi
 
+# local imports
+from webserver import Request
+from . import constants,util
+from . import Control
 
-# CONSTANTS
-YOUTUBE_API_SERVICE_NAME = "youtube"
-YOUTUBE_API_VERSION = "v3"
-YOUTUBE_CONTENT_ID_API_SERVICE_NAME = "youtubePartner"
-YOUTUBE_CONTENT_ID_API_VERSION = "v1"
+################################################################################
 
-CONTROL_STATUS_VALUES = ("preview","start","slate","noslate","cuepoint","stop")
-BROADCAST_PART = "id,snippet,contentDetails,status"
+class APIRequest(webserver.Request):
 
-# ERROR OBJECT
-class Error(Exception):
-	pass
-
-# SERVICE OBJECT
-class Service(object):
-	def __init__(self,credentials):
-		assert isinstance(credentials,oauth2_client.OAuth2Credentials)
-		assert not credentials.invalid
-		http = credentials.authorize(httplib2.Http())
-		self.youtube = apiclient_discovery.build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,http=http)
-		self.partner = apiclient_discovery.build(YOUTUBE_CONTENT_ID_API_SERVICE_NAME,YOUTUBE_CONTENT_ID_API_VERSION,http=http)
-
-	def fetch_broadcasts(self,options):
-		response = self.youtube.liveBroadcasts().list(
-			broadcastStatus=options.get('status') or 'all',
-			part=BROADCAST_PART,
-			maxResults=options.get('max-results')
-		).execute()
-		return response.get("items",[])
-	
-	def fetch_broadcast(self,options):
-		broadcast = options.get('broadcast')
-		if not broadcast:
-			raise Error("Missing broadcast")
-		response = self.youtube.liveBroadcasts().list(
-			id=broadcast,
-			part=BROADCAST_PART
-		).execute()
-		return response.get("items",[])
-	
-	
-	def fetch_streams(self,options):
-		response = self.youtube.liveStreams().list(
-			part="id,snippet,cdn,status",
-			mine="true",
-			maxResults=options.get('max-results')
-		).execute()
-		return response.get("items",[])
-
-	def control_broadcast(self,options):
-		broadcast = options.get('broadcast')
-		status = options.get('status')
-		if not broadcast:
-			raise Error("Missing broadcast")
-		if status not in CONTROL_STATUS_VALUES:
-			raise Error("Missing or invalid status: should be one of %s" % ",".join(CONTROL_STATUS_VALUES))
-		if status in ("slate"):
-			return self.youtube.liveBroadcasts().control(
-				id=broadcast,
-				displaySlate=True,
-				part=BROADCAST_PART
-			).execute()
-		if status in ("noslate"):
-			return self.youtube.liveBroadcasts().control(
-				id=broadcast,
-				displaySlate=True,
-				part=BROADCAST_PART
-			).execute()
+	def get_route(self,method,path):
+		for route in APIRequest.ROUTES:
+			assert isinstance(route,tuple) and len(route)==3
+			if method != route[0]: continue
+			if path != route[1]: continue
+			return route[2]
 		return None
 
+	def handler(self,method,path):
+		if not path.path.startswith(constants.NETWORK_BASEPATH_API):
+			return Request.handler(self,method,path)
+	
+		""" Respond with JSON """
+		self.json_response = True
+	
+		""" Route the request to the right handler """
+		api_path = path.path[len(constants.NETWORK_BASEPATH_API):]
+		api_route = self.get_route(method,api_path)
+		if not api_route:
+			raise Error("Not Found: %s" % path.path,webserver.HTTP_STATUS_NOTFOUND)
+		
+		""" Obtain the body """
+		args = ()
+		if method in (webserver.HTTP_METHOD_PUT,webserver.HTTP_METHOD_POST):
+			body = self.get_content()
+			args = (body, )
+		
+		""" Get status as a JSON object """
+		response = api_route.__get__(self,APIRequest)(*args)
+		if response==None:
+			self.send_response(webserver.HTTP_STATUS_NOCONTENT)
+			self.end_headers()
+		else:
+			self.send_response(webserver.HTTP_STATUS_OK)
+			self.send_header('Content-type',"application/json")
+			self.send_header('Date', self.date_time_string())
+			self.end_headers()
+			self.wfile.write(json.dumps(response))
+			self.wfile.write("\n")
 
-			
+	def handler_get_control(self):
+		return self.server.control.as_json()
+	
+	def handler_put_control(self,body):
+		if not isinstance(body,dict):
+			raise Error("Invalid control information",webserver.HTTP_STATUS_BADREQUEST)
 
+		# Test properties
+		for control in (Control(),self.server.control):
+			""" We reverse sort the keys so resolution gets set before bitrate """
+			for key in sorted(body.keys(),reverse=True):
+				value = body[key]
+				if isinstance(value,list) and len(value)==1:
+					""" If value is an array with one value in it """
+					value = value[0]
+				try:
+					assert hasattr(control,key)
+					setattr(control,key,value)
+				except (AssertionError,ValueError):
+					raise Error("Invalid value for '%s'" % key,webserver.HTTP_STATUS_BADREQUEST)
+		# Return the control structure
+		return self.server.control.as_json()
 
+	def handler_start_streamer(self,body):
+		""" Start streaming from the camera """
+		self.server.streamer_start()
+
+	def handler_stop_streamer(self,body):
+		""" Stop streaming from the camera """
+		self.server.streamer_stop()
+
+	def handler_status(self):
+		return {
+			"product": constants.PRODUCT_NAME,
+			"version": constants.PRODUCT_VERSION,
+			"timestamp": datetime.datetime.now().isoformat(),
+			"name": self.server.server_name,
+			"status": "idle",
+			"system": util.system_info()
+		}
+
+	def handler_shutdown(self):
+		self.server.running = False
+
+	ROUTES = (
+		(Request.METHOD_GET,"v1/status",handler_status),
+		(Request.METHOD_GET,"v1/shutdown",handler_shutdown),
+		(Request.METHOD_GET,"v1/control",handler_get_control),
+		(Request.METHOD_PUT,"v1/control",handler_put_control),
+		(Request.METHOD_POST,"v1/control",handler_put_control),
+		(Request.METHOD_PUT,"v1/start",handler_start_streamer),
+		(Request.METHOD_PUT,"v1/stop",handler_stop_streamer),
+	)
 

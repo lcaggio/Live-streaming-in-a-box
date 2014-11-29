@@ -5,6 +5,9 @@
 import os,re
 import datetime
 
+# Local imports
+from . import constants
+
 ################################################################################
 
 # Optional psutil import
@@ -39,3 +42,27 @@ def parse_duration_timedelta(value):
 		raise Error("Invalid time duration value")
 	# TODO
 
+def parse_bitrate(value):
+	""" Returns bitrate in bytes """
+	if isinstance(value,(int,long)) and value > 0:
+		return long(value)
+	elif isinstance(value,basestring) and value:
+		m = re.match(r"^\s*(\d+)\s*$",value)
+		if m:
+			v = long(m.group(1))
+			if v > 0: return v
+		m = re.match(r"^\s*(\d+)\s*(k|kb|kbps)\s*$",value)
+		if m:
+			v = long(m.group(1)) * 1000
+			if v > 0: return v
+		m = re.match(r"^\s*(\d+)\s*(M|Mb|Mbps)\s*$",value)
+		if m:
+			v = long(m.group(1)) * 1000 * 1000
+			if v > 0: return v
+	return None
+
+def get_bitrate_for_resolution(value):
+	for tuple in constants.CAMERA_RESOLUTION:
+		if tuple[0]==value:
+			return tuple[3]
+	return None
