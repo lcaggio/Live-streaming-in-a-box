@@ -47,7 +47,7 @@ import gflags
 
 # Local imports
 import livebox.constants
-import livebox.webserver
+import livebox.api
 
 ################################################################################
 # command line flags
@@ -65,19 +65,16 @@ gflags.DEFINE_string('wwwroot',os.path.join(root_path,"wwwdocs"),"Web document f
 class Error(Exception):
 	pass
 
-class Application(object):
+class Application(livebox.api.APIServer):
 	def __init__(self,bind,port,wwwroot):
 		try:
-			self._server = livebox.webserver.Server(bind,port,wwwroot)
+			livebox.api.APIServer.__init__(self,bind,port,wwwroot)
 		except livebox.webserver.Error, e:
 			raise Error(e)
 
 	@property
 	def server_url(self):
-		return urlparse.urlunparse(("http","%s:%s" % (self._server.server_name,self._server.server_port),"/",None,None,None))
-
-	def run(self):
-		self._server.run()
+		return urlparse.urlunparse(("http","%s:%s" % (self.server_name,self.server_port),"/",None,None,None))
 
 ################################################################################
 # main method

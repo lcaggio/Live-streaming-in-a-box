@@ -14,6 +14,10 @@ from . import Control
 
 ################################################################################
 
+class APIServer(webserver.Server):
+	pass
+
+
 class APIRequest(webserver.Request):
 
 	def get_route(self,method,path):
