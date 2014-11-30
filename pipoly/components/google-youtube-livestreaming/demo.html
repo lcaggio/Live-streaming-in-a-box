@@ -1,0 +1,209 @@
+<!doctype html>
+<!-- Copyright (c) 2014 Google Inc. All rights reserved. -->
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>google-youtube-upload Demo</title>
+    <script src="../bower_components/platform/platform.js"></script>
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+    <link rel="import" href="../bower_components/google-youtube/google-youtube.html">
+    <link rel="import" href="google-youtube-livestreaming.html">
+    <style>
+      body {
+        font-family: Helvetica, sans-serif;
+      }
+
+      label {
+        display: block;
+        margin-top: 1em;
+      }
+
+      input {
+        font-size: 100%;
+        width: 50%;
+      }
+
+      textarea {
+        font-size: 100%;
+        width: 50%;
+        height: 6em;
+      }
+
+    </style>
+  </head>
+  <body unresolved>
+    <template id="wrapper" is="auto-binding">
+      <p>
+        Start a YouTube livestreaming videos with a
+        <code><a href="index.html" target="_blank">&lt;google-youtube-livestreaming&gt;</a></code>
+        element!
+      </p>
+
+      <template if="{{ state == 'pre-live' }}">
+        <div>
+		  {{step}}
+          <label for="video-title">Title: {{ciao}}</label>
+          <input id="video-title" type="text" value="{{videoTitle}}">
+        </div>
+        <div>
+          <label for="description">Description:</label>
+          <textarea id="description" value="{{description}}"></textarea>
+        </div>
+        <div>
+          <label for="privacy-status">Privacy Status:</label>
+          <select id="privacy-status" value="{{privacyStatus}}">
+            <option>public</option>
+            <option>unlisted</option>
+            <option>private</option>
+          </select>
+        </div>
+      </template>
+
+      <google-youtube-livestreaming
+        style="display: {{ (state == 'pre-live') ? 'block' : 'none' }}"
+        clientId="677065423857-mpp75lilvod2ghfusdoigtpn23sj7s5c.apps.googleusercontent.com"
+        videoTitle="{{videoTitle}}"
+        description="{{description}}"
+        privacyStatus="{{privacyStatus}}"
+        videoId="{{videoId}}"
+		broadcastId="{{broadcastId}}"
+		StreamId="{{streamId}}"		
+		streamName="{{streamName}}"
+        on-youtube-broadcast-created="{{handleYouTubeLiveBroadcastCreated}}"
+        on-youtube-stream-created="{{handleYouTubeLiveStreamCreated}}"
+        on-youtube-stream-binded="{{handleYouTubeLiveStreamBinded}}"
+        on-youtube-transition-testing="{{handleYouTubeLiveTransitionTesting}}"
+        on-youtube-transition-live="{{handleYouTubeLiveTransitionLive}}"
+        on-youtube-live-on-air="{{handleYouTubeLiveOnAir}}">
+      </google-youtube-livestreaming>
+
+      <template if="{{ state == 'handleYouTubeLiveBroadcastCreated' }}">
+        <div>
+			{{step}} - HandleYouTubeLiveBroadcastCreated <br />
+			1. Broadcast element created: OK
+        </div>
+		<div>
+			BroadCast ID: {{broadcastId}} <br />
+			Stream ID: {{streamId}} <br />		
+			Stream Name: {{streamName}}	<br/>
+			Video ID: {{videoId}} <br />			
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveStreamCreated' }}">
+        <div>
+			{{step}} - HandleYouTubeLiveStreamCreated <br />
+			1. Broadcast element created: OK <br />
+			2. Stream element created: OK <br />	
+        </div>
+		<div>
+			BroadCast ID: {{broadcastId}} <br />
+			Stream ID: {{streamId}} <br />			
+			Stream Name: {{streamName}}	<br/>			
+			Video ID: {{videoId}} <br />			
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveStreamBinded' }}">
+        <div>
+			HandleYouTubeLiveStreamBinded <br />
+			1. Broadcast element created: OK <br />
+			2. Stream element created: OK <br />
+			3. Stream and Broadcast binded: OK	<br />		
+        </div>
+		<div>
+			BroadCast ID: {{broadcastId}} <br />
+			Stream ID: {{streamId}} <br />		
+			Stream Name: {{streamName}}	<br/>				
+			Video ID: {{videoId}} <br />			
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveTransitionTesting' }}">
+        <div>
+			HandleYouTubeLiveTransitionTesting <br />
+			1. Broadcast element created: OK <br />
+			2. Stream element created: OK <br />
+			3. Stream and Broadcast binded: OK <br />
+			4. Transitioning to Test: OK <br />
+        </div>
+		<div>
+			BroadCast ID: {{broadcastId}} <br />
+			Stream ID: {{streamId}} <br />			
+			Stream Name: {{streamName}} <br />			
+			Video ID: {{videoId}} <br />			
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveTransitionLive' }}">
+        <div>
+			HandleYouTubeLiveTransitionLive <br />
+			1. Broadcast element created: OK <br />
+			2. Stream element created: OK <br />
+			3. Stream and Broadcast binded: OK <br />
+			4. Transitioning to Test: OK <br />
+			5. Transitioning to Live: OK <br />		
+        </div>
+		<div>
+			BroadCast ID: {{broadcastId}} <br />
+			Stream ID: {{streamId}} <br />		
+			Stream Name: {{streamName}}	<br/>				
+			Video ID: {{videoId}} <br />			
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveOnAir' }}">
+        <div>
+			HandleYouTubeLiveOnAir <br />
+			1. Broadcast element created: OK <br />
+			2. Stream element created: OK <br />
+			3. Stream and Broadcast binded: OK <br />
+			4. Transitioning to Test: OK <br />
+			5. Transitioning to Live: OK <br />
+			<br />
+			WE ARE LIVE!			
+        </div>
+		<google-youtube videoId="{{videoId}}"></google-youtube>
+		<div>
+			BroadCast ID: {{broadcastId}} <br />
+			Stream ID: {{streamId}} <br />		
+			Stream Name: {{streamName}}	<br/>					
+			Video ID: {{videoId}} <br />			
+		</div>
+      </template>
+
+      <template if="{{ state == 'error' }}">
+        <p>{{error}}</p>
+      </template>
+    </template>
+
+    <script>
+      var template = document.getElementById('wrapper');
+      template.state = 'pre-live';
+
+      template.handleYouTubeLiveBroadcastCreated = function(e) {
+        template.state = 'handleYouTubeLiveBroadcastCreated';
+      };
+
+      template.handleYouTubeLiveStreamCreated = function(e) {
+        template.state = 'handleYouTubeLiveStreamCreated';
+      };
+
+      template.handleYouTubeLiveStreamBinded = function(e) {
+        template.state = 'handleYouTubeLiveStreamBinded';
+      };
+
+      template.handleYouTubeLiveTransitionTesting = function(e) {
+        template.state = 'handleYouTubeLiveTransitionTesting';
+      };
+
+      template.handleYouTubeLiveTransitionLive = function(e) {
+        template.state = 'handleYouTubeLiveTransitionLive';
+      };
+
+      template.handleYouTubeLiveOnAir = function(e) {
+        template.state = 'handleYouTubeLiveOnAir';
+      };
+    </script>
+  </body>
+</html>

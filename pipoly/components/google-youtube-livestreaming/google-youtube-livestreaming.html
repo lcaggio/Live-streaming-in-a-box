@@ -1,0 +1,408 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-signin/google-signin.html">
+
+<!--
+Element enabling you to upload videos to YouTube.
+
+##### Examples
+
+Manual upload with a `Video Upload` button once a video file is selected:
+
+    <google-youtube-livestreaming clientId="..."></google-youtube-livestreaming>
+
+Automatic upload on video file select, with a custom title, and 'unlisted' privacy:
+
+    <google-youtube-livestreaming
+      auto
+      videoTitle="My Awesome Video"
+      privacyStatus="unlisted"
+      clientId="...">
+    </google-youtube-livestreaming>
+
+@element google-youtube-livestreaming
+@blurb Element enabling you to upload videos to YouTube.
+@status alpha
+@homepage https://googlewebcomponents.github.io/google-youtube-livestreaming
+-->
+<polymer-element name="google-youtube-livestreaming" attributes="auto step videoTitle clientId description tags categoryId privacyStatus videoId broadcastId streamId streamName">
+  <template>
+    <link rel="stylesheet" href="google-youtube-livestreaming.css"/>
+    <script src="../cors-upload-sample/upload.js"></script>
+
+    <div id="login-logout">
+      <img id="channel-image" src="{{channel.thumbnail}}" style="display: {{ channel.thumbnail ? 'inline' : 'none' }}">
+      <span id="channel-name">{{channel.name}}</span>
+
+      <google-signin
+        clientId="{{clientId}}"
+        scopes="https://www.googleapis.com/auth/youtube">
+      </google-signin>
+    </div>
+
+    <div style="display: {{ authenticated ? 'block' : 'none' }}">
+      <button on-click="{{handleStartLivestreaming}}" style="display: 'block'">Start Livestreaming</button>
+    </div>
+  </template>
+
+  <script>
+  
+
+  
+  
+    (function() {
+      var STATUS_POLLING_ITERVAL_MILLIS = 10 * 1000; // 10 sec.
+Date.prototype.addHours= function(h){
+    this.setHours(this.getHours()+h);
+    return this;
+}
+
+
+      Polymer('google-youtube-livestreaming', {
+        /**
+         * Fired when the upload begins.
+         *
+         * `e.detail` is set to the
+         * [file](https://developer.mozilla.org/en-US/docs/Web/API/File)
+         * being uploaded.
+         *
+         * @event youtube-upload-start
+         * @param {Object} e Event parameters.
+         */
+
+        /**
+         * Fired when Broadcast is created.
+         *
+         * `e.detail` is set to the BroadcastID.
+         *
+         * @event youtube-broadcast-created
+         * @param {Object} e Event parameters.
+         */
+
+
+        /**
+         * An OAuth 2 clientId reference, obtained from the
+         * [Google Developers Console](https://console.developers.google.com).
+         *
+         * Follow
+         * [the steps](https://developers.google.com/console/help/new/#generatingoauth2)
+         * for registering for OAuth 2, ensure that the
+         * [YouTube Data API v3](https://developers.google.com/youtube/registering_an_application)
+         * is enabled for your API project, and ensure that the JavaScript Origin
+         * is set to the domain hosting the page on which
+         * you'll be using this element.
+         *
+         * @attribute clientId
+         * @type string
+         * @default ''
+         */
+        clientId: '',
+
+        /**
+         * Whether the user has authenticated or not.
+         *
+         * @attribute authenticated
+         * @type boolean
+         */
+        authenticated: false,
+
+        /**
+         * The title for the new YouTube livestream.
+         *
+         * @attribute title
+         * @type string
+         * @default 'Untitled Video'
+         */
+        videoTitle: 'Live! Created via web component!',
+
+        /**
+         * The description for the new YouTube livestream.
+         *
+         * @attribute description
+         * @type string
+         * @default 'Created via web component!'
+         */
+        description: 'Created via web component!',
+
+        /**
+         * The [privacy setting](https://support.google.com/youtube/answer/157177?hl=en)
+         * for the new video.
+         *
+         * Valid values are 'public', 'private', and 'unlisted'.
+         *
+         * @attribute privacyStatus
+         * @type string
+         * @default 'unlisted'
+         */
+        privacyStatus: 'unlisted',
+
+        /**
+         * The id of the new video.
+         *
+         * This is set as soon as a `youtube-upload-complete` event is fired.
+         *
+         * @attribute videoId
+         * @type string
+         * @default ''
+         */
+        videoId: '',
+
+        /**
+         * The id of the new broadcast.
+         *
+         * @attribute broadcastId
+         * @type string
+         * @default ''
+         */
+        broadcastId: '',
+
+        /**
+         * The id of the new stream.
+         *
+         * @attribute streamId
+         * @type string
+         * @default ''
+         */
+        streamId: '',
+
+        /**
+         * The name of the new stream.
+         *
+         * @attribute streamName
+         * @type string
+         * @default ''
+         */
+		streamName: '',
+
+        /**
+         * The status of the process.
+         *
+         * Valid values are 'OK', 'KO'.
+         *
+         * @attribute status
+         * @type string
+         * @default 'unlisted'
+         */
+        status: 'OK',
+
+        /**
+         * The lifeCycleStatus of the process.
+         *
+         * @attribute lifeCycleStatus
+         * @type string
+         * @default ''
+         */
+		lifeCycleStatus: '',		
+
+        created: function() {
+          this.channel = {
+            name: 'Not Logged In',
+            thumbnail: ''
+          };
+        },
+
+        ready: function() {
+          document.addEventListener('google-signin-success', function(e) {
+            this.accessToken = e.detail.result.access_token;
+            this.gapi = e.detail.gapi;
+			this.gapi.client.load('youtube', 'v3', function() {});
+            this.authenticated = true;
+
+            this.gapi.client.request({
+              path: '/youtube/v3/channels',
+              params: {
+                part: 'snippet',
+                mine: true
+              },
+              callback: function(response) {
+                if (response.error) {
+                  this.fire('youtube-upload-fail', response.error.message);
+                } else {
+                  this.channel.name = response.items[0].snippet.title;
+                  this.channel.thumbnail = response.items[0].snippet.thumbnails.default.url;
+                }
+              }.bind(this)
+            });
+          }.bind(this));
+
+          document.addEventListener('google-signed-out', function(e) {
+            this.authenticated = false;
+            this.channel.name = 'Not Logged In';
+            this.channel.thumbnail = '';
+          }.bind(this));
+        },
+
+		livestreamCreateBroadcast: function() {		
+/*		
+				console.log("create_event called");
+				var startdate = new Date();
+				
+
+				
+				
+				var laterdate = new Date().addHours(2);
+  
+				console.log("Pi Event " + startdate.toLocaleString());
+		
+				// create new broadcast
+				var request = gapi.client.youtube.liveBroadcasts.insert( {
+				   part: 'snippet, status, contentDetails, id',
+				   snippet: {
+						scheduledEndTime:laterdate.toISOString(),
+						scheduledStartTime:startdate.toISOString(),
+						title: "Pi Event" + startdate.toLocaleString(),
+						description: "dummy description"
+				  },
+				  status: {
+						privacyStatus: "unlisted"
+				  },
+				  contentDetails: {
+					 monitorStream : {
+						enableMonitorStream: false
+					 }
+				  }
+				});
+				request.execute(function(response) {
+		
+					eventId = response.result.id;
+					console.log("inserted event");
+				});
+
+		
+*/		
+		
+		
+		
+		
+		  var request = this.gapi.client.youtube.liveBroadcasts.insert({
+		    snippet: { scheduledStartTime : '2014-12-30T00:00:00.000Z',
+                       title: this.videoTitle},
+		    status: {privacyStatus: this.privacyStatus},
+		    part: 'snippet, status'
+		  });
+		  console.log("about to create broadcast");
+		  request.execute(function(response) {
+			this.lifeCycleStatus =  response.status.lifeCycleStatus;
+			this.broadcastId = response.result.id;
+			this.fire('youtube-broadcast-created', this.broadcastId);
+		  }.bind(this));
+		},
+		
+		livestreamCreateStream: function() {
+		  var request = this.gapi.client.youtube.liveStreams.insert({
+		    snippet: { title: this.videoTitle,
+					   description: this.description},
+			cdn: {format: '360p',
+				  ingestionType: 'rtmp'},
+		    part: 'id, snippet, cdn, status'
+		  });
+		
+		  request.execute(function(response) {
+			this.streamStatus =  response.status.streamStatus;
+			this.streamId = response.id;
+			this.streamName = response.cdn.ingestionInfo.streamName;
+			this.fire('youtube-stream-created', this.streamId);
+		  }.bind(this));
+		},
+
+		livestreamBinded: function() {
+		  var request = this.gapi.client.youtube.liveBroadcasts.bind({
+			id: this.broadcastId,
+			part: 'id, snippet, status',
+			streamId: this.streamId
+		  });
+		  
+		  request.execute(function(response) {
+			this.lifeCycleStatus =  response.status.lifeCycleStatus;
+			this.videoId = response.result.id;
+			this.fire('youtube-stream-binded', this.videoId);
+		  }.bind(this));
+		},
+
+		livestreamTransitionTesting: function() {
+		  var request = this.gapi.client.youtube.liveStreams.list({
+			part: 'id, status',
+			id: this.streamId,
+		  });
+		  
+		  request.execute(function(response) {
+			this.streamStatus =  response.items[0].status.streamStatus;
+		  }.bind(this));
+		
+		  if (this.streamStatus == 'ready') { 
+			this.fire('youtube-stream-binded', this.videoId);
+		  } else if (this.streamStatus == 'active'){ 
+			var request = this.gapi.client.youtube.liveBroadcasts.list({
+			  id: this.broadcastId,
+			  part: 'snippet, status'
+			});
+            
+			request.execute(function(response) {
+			  this.lifeCycleStatus =  response.items[0].status.lifeCycleStatus;
+			}.bind(this));
+			
+			if (this.lifeCycleStatus == 'testing') {
+				this.fire('youtube-transition-testing', this.videoId);
+			} else if (this.lifeCycleStatus == 'ready')  {
+			  var request = this.gapi.client.youtube.liveBroadcasts.transition({
+			  	part: 'id, status',
+			  	id: this.broadcastId,
+			  	broadcastStatus: 'testing'
+			  });
+              
+			  request.execute(function(response) {
+			  	this.lifeCycleStatus =  response.status.lifeCycleStatus;
+	 		    this.fire('youtube-stream-binded', this.videoId);
+			  }.bind(this));
+			} else { this.fire('youtube-stream-binded', this.videoId); }
+		  }
+		},	
+
+		livestreamTransitionLive: function() {
+		  var request = this.gapi.client.youtube.liveBroadcasts.transition({
+			part: 'id, status',
+			id: this.broadcastId,
+			broadcastStatus: 'live'
+		  });
+		  
+		  request.execute(function(response) {
+			this.lifeCycleStatus =  response.status.lifeCycleStatus;
+ 		    this.fire('youtube-transition-live', this.videoId);
+		  }.bind(this));
+		},		
+
+		livestreamTransitionLiveCheck: function() {
+		  alert('e');
+		  var request = this.gapi.client.youtube.liveBroadcasts.list({
+		    id: this.broadcastId,
+		    part: 'snippet, status'
+		  });
+          
+		  request.execute(function(response) {
+		    this.lifeCycleStatus =  response.items[0].status.lifeCycleStatus;
+		    if (this.lifeCycleStatus == 'live') {this.fire('youtube-live-on-air', this.videoId);}
+		    else { this.fire('youtube-transition-live', this.videoId); }
+		  }.bind(this));
+		},		
+			
+        handleStartLivestreaming: function() {
+		  this.livestreamCreateBroadcast();
+		  document.querySelector('google-youtube-livestreaming').addEventListener('youtube-broadcast-created', function() {
+			this.livestreamCreateStream();
+		  });
+		  document.querySelector('google-youtube-livestreaming').addEventListener('youtube-stream-created', function() {
+			this.livestreamBinded();
+		  });
+		  document.querySelector('google-youtube-livestreaming').addEventListener('youtube-stream-binded', function() {
+			setTimeout(function() {this.livestreamTransitionTesting();}.bind(this), STATUS_POLLING_ITERVAL_MILLIS);
+		  });
+		  document.querySelector('google-youtube-livestreaming').addEventListener('youtube-transition-testing', function() {
+			setTimeout(function() {this.livestreamTransitionLive();}.bind(this), STATUS_POLLING_ITERVAL_MILLIS);
+		  });		
+		  document.querySelector('google-youtube-livestreaming').addEventListener('youtube-transition-live', function() {
+			setTimeout(function() {this.livestreamTransitionLiveCheck();}.bind(this), STATUS_POLLING_ITERVAL_MILLIS);
+		  });		
+        }		
+      });
+    })();
+  </script>
+</polymer-element>
