@@ -1,0 +1,157 @@
+<html>
+<head>
+
+</head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+<TITLE>Camera</TITLE>
+
+<FORM NAME="camcontrols" ACTION="" METHOD="GET">
+Picture:<br>
+<label for="width">Width</label>
+<INPUT NAME="width" type=text value=1600>
+<label for="height">Height</label>
+<INPUT NAME="height" type=text value=1200>
+<br>
+<label for="timeout">Timeout (ms)</label>
+<INPUT NAME="timeout" type=text value=500>
+<label for="sharpness">Sharpness (-100 to 100)</label>
+<INPUT NAME="sharpness" type=text value=0>
+<label for="brightness">Brightness (0 to 100)</label>
+<INPUT NAME="brightness" type=text value=50>
+<br>
+<label for="ISO">ISO</label>
+<select NAME="ISO" value=800>
+ <option>100</option>
+ <option>200</option>
+ <option>400</option>
+ <option>800</option>
+</select>
+<label for="exposure">Exposure</label>
+<select NAME="exposure" value="auto" >
+ <option>auto</option>
+ <option>manual</option>
+ <option>night</option>
+ <option>nightpreview</option>
+ <option>backlight</option>
+ <option>spotlight</option>
+ <option>sports</option>
+ <option>snow</option>
+ <option>beach</option>
+ <option>verylong</option>
+ <option>fixedfps</option>
+ <option>antishake</option>
+ <option>fireworks</option>
+</select>
+<label for="shutter">Shutter speed (if manual uS below 330000)</label>
+<br>
+<INPUT NAME="shutter" type=text value=0>
+<label for="awb">White Balance</label>
+<select NAME="awb" value="auto">
+ <option>auto</option>
+ <option>sun</option>
+ <option>cloud</option>
+ <option>shade</option>
+ <option>tungsten</option>
+ <option>fluorescent</option>
+ <option>incandescent</option>
+ <option>flash</option>
+ <option>horizon</option>
+ <option>off</option>
+</select>
+<label for="imxfx">Image Effect</label>
+<select NAME="ifx" >
+ <option>none</option>
+ <option>negative</option>
+ <option>solarise</option>
+ <option>sketch</option>
+ <option>denoise</option>
+ <option>emboss</option>
+ <option>oilpaint</option>
+ <option>hatch</option>
+ <option>gpen</option>
+ <option>pastel</option>
+ <option>watercolour</option>
+ <option>film</option>
+ <option>blur</option>
+ <option>saturation</option>
+ <option>colourswap</option>
+ <option>washedout</option>
+ <option>posterise</option>
+ <option>colourpoint</option>
+ <option>colourbalance</option>
+ <option>cartoon</option>
+</select>
+<label for="metering">Meter mode</label>
+<select NAME="metering" >
+ <option>average</option>
+ <option>spot</option>
+ <option>backlit</option>
+ <option>matrix</option>
+</select>
+</FORM>
+<button onclick="reloadpic()">Reload</button>
+<button onclick="autoRun()">AutoRun</button>
+<div id="countdown"></div><br>
+<img id="cam" name="camerapic" src="/camera?height=1200&width=1600">
+
+
+<script type="text/javascript">
+
+var FREQ = 5;
+
+
+function autoRun() {
+    var trigger = 0;
+    setInterval(function() {
+
+        if (trigger == FREQ) {
+                $("#countdown").html("SNAP!");
+                reloadpic();
+                trigger = 0;
+        }
+        else {
+                trigger += 1;
+                $("#countdown").html("Seconds to snapshot: " + String(FREQ+1 - trigger));
+        }
+    }, 1000);
+
+}
+
+
+	
+
+
+function reloadpic() {
+
+        camurl = "/camera?";
+        camurl += "ifx=" + document.camcontrols.ifx.value;
+        camurl += "&sharpness=" + document.camcontrols.sharpness.value
+        camurl += "&brightness=" + document.camcontrols.brightness.value
+        //camurl += "&ISO=" + document.camcontrols.ISO.value
+        camurl += "&awb=" + document.camcontrols.awb.value
+        if (document.camcontrols.exposure.value == "manual"  && document.camcontrols.shutter.value > 0) {
+            camurl += "&shutter=" + document.camcontrols.shutter.value;
+        }
+        else {
+           camurl += "&exposure=" + document.camcontrols.exposure.value;
+           camurl += "&metering=" + document.camcontrols.metering.value;
+        }
+
+        camurl += "&height="+document.camcontrols.height.value+"&width=" + document.camcontrols.width.value + "?" + Math.random();
+
+
+        console.log(camurl);
+        $("#cam").attr("src", camurl);
+}
+</script>
+
+
+</BODY>
+</HTML>
+
+
+
+
+
