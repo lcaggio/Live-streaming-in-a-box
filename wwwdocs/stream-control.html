@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+
+  <title>core-ajax</title>
+  <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <link rel="import" href="bower_components/core-ajax/core-ajax.html">
+  <link rel="import" href="bower_components/core-pages/core-pages.html">  
+  <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">  
+  <link rel="import" href="bower_components/paper-button/paper-button.html">    
+  
+  <style>
+  paper-tabs::shadow #selectionBar {
+    background-color: #5264ae;
+  }
+  paper-tabs paper-tab::shadow #ink {
+    color: #5264ae;
+  }  
+  </style>
+ <style>
+
+   body {
+     font-family: sans-serif;
+     color: #333;
+     margin: 10;
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+     -webkit-tap-highlight-color: rgba(0,0,0,0);
+     -webkit-touch-callout: none;
+   }
+
+ </style>   
+
+</head>
+<body>
+
+  <core-ajax id="updateStatus" url="/api/v1/status" 
+      params='{"alt":"json", "q":"chrome"}'
+      handleAs="json"></core-ajax>
+  <core-ajax id="setStream" url="/api/v1/control" 
+      params='{	"name": "lorenzo.caggioni.2v3q-bb4u-pa86-3xzb",
+				"url": "rtmp://a.rtmp.youtube.com/live2",
+				"resolution": "360p",
+				"bitrate": 100000,
+				"video": "picamera",
+				"audio": "1kHz",
+				"fps": 25,
+				"quality": null }'
+      handleAs="json"></core-ajax>
+  <core-ajax id="startStream" url="/api/v1/start" handleAs="json"></core-ajax>
+  <core-ajax id="stopStream" url="/api/v1/stop" 
+      params='{"alt":"json", "q":"chrome"}'
+      handleAs="json"></core-ajax>	  	  
+	  
+<paper-tabs selected="0">
+  <paper-tab>Status</paper-tab>
+  <paper-tab>Start</paper-tab>
+  <paper-tab>Stop</paper-tab>
+</paper-tabs>
+
+<core-pages selected="0">
+  <div><br>
+	   <paper-button onclick="updateStatus()" raised>Update Status</paper-button>
+		<template bind="{{response}}">
+			<br />
+			<br />			
+        	<div>status: {{status}}</div><br />
+			<div>product: {{product}}</div>
+		</template>
+  </div>
+  <div>
+  	<paper-button onclick="setStream()" raised>Set Stream</paper-button>
+  	<paper-button onclick="startStream()" raised>Start Stream</paper-button>
+	
+  </div>
+  <div>
+  	<paper-button onclick="stopStream()" raised>Stop Stream</paper-button>  	
+  </div>
+</core-pages>
+    
+
+ <script>
+ var tabs = document.querySelector("paper-tabs");
+ var pages = document.querySelector("core-pages");
+ 
+ tabs.addEventListener("core-select", function() {
+   pages.selected = tabs.selected;
+ });
+ </script>
+ 
+  <script>
+	 function updateStatus() {
+             var ajax = document.querySelector("#updateStatus");
+             ajax.addEventListener("core-response", 
+                 function(e) {
+                     document.querySelector('template').model = {
+                         response: e.detail.response
+                     };
+                 }
+             );
+			 ajax.go();
+     }
+	 function startStream() {
+             var ajax = document.querySelector("#startStream");
+             ajax.addEventListener("core-response", 
+                 function(e) {
+                     alert(e);
+                 }
+             );
+			 alert(ajax.params);
+			 ajax.go();
+     }	 
+	 function setStream() {
+             var ajax = document.querySelector("#setStream");
+             ajax.addEventListener("core-response", 
+                 function(e) {
+                     alert(e);
+                 }
+             );
+			 ajax.go();
+     }	 
+	 function stopStream() {
+             var ajax = document.querySelector("#stopStream");
+             ajax.addEventListener("core-response", 
+                 function(e) {
+                     alert(e);
+                 }
+             );
+			 ajax.go();
+     }	 	 
+  </script> 
+</body>
+</html>

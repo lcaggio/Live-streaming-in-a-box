@@ -3,8 +3,6 @@
   <head>
     <!-- 1. Load platform support before any code that touches the DOM. -->
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <!-- 2. Load the component using an HTML Import -->
-    <link rel="import" href="elements/my-element.html">
 	
 <link rel="import" 
   href="bower_components/core-toolbar/core-toolbar.html">
@@ -40,8 +38,9 @@
 <body unresolved>
 
 	<sampler-scaffold label="Raspberry live box" fit>
-	  	<core-item label="WiFi contifuration" tag="pi-configuration" url="wifi-config.php"></core-item>
-		<core-item label="Livestreaming" tag="pi-live" url="/google-youtube-livestreaming/demo.html"></core-item>
+	  	<core-item label="WiFi configuration" tag="pi-configuration" url="wifi-config.php"></core-item>
+		<core-item label="Livestreaming" tag="pi-live" url="/livestreaming-config.html"></core-item>
+		<core-item label="Stream Control" tag="pi-stream" url="/stream-control.html"></core-item>
 	</sampler-scaffold>	
 	
 </body>
