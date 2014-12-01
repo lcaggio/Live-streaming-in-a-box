@@ -1,0 +1,633 @@
+<!doctype html>
+<html>
+<head>
+  <title>Pi Camera Server</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <link rel="import" href="../components/font-roboto/roboto.html">
+  <link rel="import" href="../components/core-header-panel/core-header-panel.html">
+  <link rel="import" href="../components/core-toolbar/core-toolbar.html">
+  <link rel="import" href="../components/core-pages/core-pages.html">
+  <link rel="import" href="../components/paper-button/paper-button.html"> 
+  <link rel="import" href="../components/settings-button/settings-button.html">
+  <link rel="import" href="../components/refresh-button/refresh-button.html">
+  <link rel="import" href="../components/accept-button/accept-button.html">
+  <link rel="import" href="../components/paper-ripple/paper-ripple.html">
+  <link rel="import" href="../components/paper-button/paper-button.html">
+  <link rel="import" href="../components/kill-button/kill-button.html">
+  <link rel="import" href="../components/paper-input/paper-input.html">
+  <link rel="import" href="../components/go-live-button/go-live-button.html">
+  <link rel="import" href="../components/width-slider/width-slider.html">
+  <link rel="import" href="../components/height-slider/height-slider.html">
+  <link rel="import" href="../components/shutter-slider/shutter-slider.html">
+  <link rel="import" href="../components/brightness-slider/brightness-slider.html">
+  <link rel="import" href="../components/sharpness-slider/sharpness-slider.html">
+  <link rel="import" href="../components/paper-slider/paper-slider.html">  
+  <link rel="import" href="../components/mypaper-slider/mypaper-slider.html">
+  <link rel="import" href="../components/shutter-slider/shutter-slider.html">  
+  <link rel="import" href="../components/paper-shadow/paper-shadow.html">
+  <link rel="import" href="../components/effect-item/effect-item.html">
+  <link rel="import" href="../components/effect-item/effect-item.html">
+  <link rel="import" href="../components/paper-item/paper-item.html">
+  <link rel="import" href="../components/paper-fab/paper-fab.html">
+  <link rel="import" href="../components/paper-tabs/paper-tabs.html">
+  <link rel="import" href="../components/paper-dropdown-menu/paper-dropdown-menu.html">
+  <link rel="import" href="../components/effect-dropdown-menu/effect-dropdown-menu.html">
+  <link rel="import" href="../components/exposure-dropdown-menu/exposure-dropdown-menu.html">
+  <link rel="import" href="../components/awb-dropdown-menu/awb-dropdown-menu.html">
+  <link rel="import" href="../components/iso-dropdown-menu/iso-dropdown-menu.html">
+  <link rel="import" href="../components/drc-dropdown-menu/drc-dropdown-menu.html">
+  <link rel="import" href="../components/cam-dropdown-menu/cam-dropdown-menu.html">
+  <link rel="import" href="../components/paper-dialog/paper-dialog.html">
+  <link rel="import" href="../components/paper-toast/paper-toast.html">
+  <link rel="import" href="../components/paper-toggle-button/paper-toggle-button.html">
+  <link rel="import" href="../components/rpi-youtube-livestreaming/rpi-youtube-livestreaming.html">
+  <link rel="import" href="../components/google-youtube/google-youtube.html">
+
+ <!-- <link rel="import" href="../components/google-youtube-upload/google-youtube-upload.html"> -->
+ <link rel="icon" type="image/png" href="rpi-youtube.png" />
+  
+  <style>
+  html,body {
+    height: 100%;
+    margin: 0;
+    padding: 10px;
+    background-color: #E5E5E5;
+    font-family: 'RobotoDraft', sans-serif;
+    color: #858585;
+  }
+
+  .mydrops {  
+    padding-right: 10px;
+    padding-left: 5px;
+  }
+
+  paper-fab {
+	position: absolute;
+	top: 32px;
+	left: 12px;
+  }
+  paper-tabs {
+  	background-color: #9C1A30;
+  	box-shadow: 0px 3px 2px rgba(0,0,0,0.2);
+  	color: #fff;
+  }
+  
+  paper-input {
+      width: 280px;
+  }
+
+  paper-input-decorator {
+      max-width: 280px;
+  }
+  
+  paper-input.narrow {
+      width: 150px;
+  }
+
+  paper-toast {
+	bottom: 600px;
+   	left: 260px;
+  }
+  paper-dropdown-menu {
+    padding-left: 10px;
+    background-color: transparent;
+  }
+  
+  go-live-button {
+   	padding: 10px;
+  }
+  
+  effect-item, effect-item {  
+    background: #eee;
+  }
+ 
+ .width-slider {
+ 
+ 	width: 233px;
+  }
+  
+  #exposure-container {
+    width: 350px;
+  }
+ 
+ #live-input {
+ 	padding: 10px;
+ 	width: 350px;
+  } 
+  shutter-slider {
+  
+  width: 250px;
+  }
+
+  :unresolved {
+    display: flex;
+    justify-content: center;
+    background: rgba(255,255,255,0.5);
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+  }
+  :unresolved:after {
+    padding: 15px;
+    content: 'loading...';
+    color: #ccc;
+  }
+  
+  label {
+    display: block;
+    margin-top: 1em;
+  }
+
+  input {
+	font-size: 100%;
+	width: 50%;
+  }
+
+  textarea {
+	font-size: 100%;
+	width: 50%;
+	height: 6em;
+  }
+  #description {
+  
+    width 500px;
+  }
+
+</style>
+</head>
+
+<body unresolved>
+<paper-toast id="picture-toast-message" duration="3000" class="capsule" text="Requesting new picture..." style="padding-right: 60px;" ></paper-toast>
+<paper-dialog>
+<div horizontal layout>
+  <div>
+	<div horizontal center layout>
+	  image effect:
+	  <effect-dropdown-menu class="mydrops" selected="none" valueattr="label" valign="top">
+		 <effect-item label="none"></effect-item>
+		 <effect-item label="negative"></effect-item>
+		 <effect-item label="solarise"></effect-item>
+		 <effect-item label="sketch"></effect-item>
+		 <effect-item label="denoise"></effect-item>
+		 <effect-item label="emboss"></effect-item>
+		 <effect-item label="oilpaint"></effect-item>
+		 <effect-item label="hatch"></effect-item>
+		 <effect-item label="gpen"></effect-item>
+		 <effect-item label="pastel"></effect-item>
+		 <effect-item label="watercolour"></effect-item>
+		 <effect-item label="film"></effect-item>
+		 <effect-item label="blur"></effect-item>
+		 <effect-item label="saturation"></effect-item>
+		 <effect-item label="colourswap"></effect-item>
+		 <effect-item label="washedout"></effect-item>
+		 <effect-item label="posterise"></effect-item>
+		 <effect-item label="colourpoint"></effect-item>
+		 <effect-item label="colourbalance"></effect-item>
+		 <effect-item label="cartoon"></effect-item>
+	  </effect-dropdown-menu>
+	</div>
+	
+	<br><div id="exposure-container">
+	<div horizontal center layout>
+	  exposure:  
+	  <exposure-dropdown-menu class="mydrops" selected="auto" valueattr="label">
+		<effect-item label="auto"></effect-item>
+		<effect-item label="manual"></effect-item>
+		<effect-item label="night"></effect-item>
+		<effect-item label="nightpreview"></effect-item>
+		<effect-item label="backlight"></effect-item>
+		<effect-item label="spotlight"></effect-item>
+		<effect-item label="sports"></effect-item>
+		<effect-item label="snow"></effect-item>
+		<effect-item label="beach"></effect-item>
+		<effect-item label="verylong"></effect-item>
+		<effect-item label="fixedfps"></effect-item>
+		<effect-item label="antishake"></effect-item>
+		<effect-item label="fireworks"></effect-item>
+	  </exposure-dropdown-menu>
+    </div>
+    
+	<div horizontal center layout>  
+     &nbsp;&nbsp;&nbsp;&nbsp;shutter: <shutter-slider class="shutter" min="0" max="330000" value="800" disabled></shutter-slider>
+    </div>
+
+	<br><br><div horizontal center layout>
+	  white balance:
+	  <awb-dropdown-menu class="mydrops" selected="auto" valueattr="label" valign="top">
+		<effect-item label="auto"></effect-item>
+		<effect-item label="sun"></effect-item>
+		<effect-item label="cloud"></effect-item>
+		<effect-item label="shade"></effect-item>
+		<effect-item label="tungsten"></effect-item>
+		<effect-item label="fluorescent"></effect-item>
+		<effect-item label="incandescent"></effect-item>
+		<effect-item label="flash"></effect-item>
+		<effect-item label="horizon"></effect-item>
+		<effect-item label="off"></effect-item>
+	  </awb-dropdown-menu>
+    </div>
+
+    </div>
+ 	<br><div horizontal center layout>    
+    
+	  iso:<iso-dropdown-menu class="mydrops" selected="400" valueattr="label" valign="top">
+		 <effect-item label="100"></effect-item>
+		 <effect-item label="200"></effect-item>
+		 <effect-item label="400"></effect-item>
+		 <effect-item label="800"></effect-item>
+	  </iso-dropdown-menu>
+    </div>
+    <br><div horizontal center layout>  
+	  drc:<drc-dropdown-menu class="mydrops" selected="off" valueattr="label" valign="top">
+		 <effect-item label="off"></effect-item>
+		 <effect-item label="low"></effect-item>
+		 <effect-item label="medium"></effect-item>
+		 <effect-item label="high"></effect-item>
+	  </drc-dropdown-menu>
+    </div>
+   </div>
+  
+  <div>
+	<div horizontal center layout>
+	  brightness:<brightness-slider max="100" value="50" editable></brightness-slider>
+	</div>
+	<div horizontal center layout>
+	  sharpness:<sharpness-slider max="100" value="50" editable></sharpness-slider>
+	</div>
+	<br><br><br>
+	<div id="width-container" horizontal center layout flex>
+	  width:<width-slider class="width-slider"  max="2592" value="800" editable></width-slider>
+	</div>
+	<div horizontal center layout flex>
+	  height:<height-slider class="width-slider"  max="1944" value="600" editable></height-slider>
+	</div>
+  </div>
+  
+</div>
+
+  <br><br>
+  <paper-button affirmative >Cancel</paper-button> 
+  <accept-button affirmative autofocus >OK</accept-button>
+</paper-dialog>
+
+<paper-tabs selected="0">
+  <paper-tab>Camera</paper-tab>
+  <paper-tab>YouTube Live</paper-tab>
+  <paper-tab>Stream Control</paper-tab>
+</paper-tabs>
+
+<core-pages flex>
+   <div>
+     <br>
+     <div id="cam"></div>
+     <paper-fab mini icon='settings-display'></paper-fab>
+   </div>
+
+  <div>  
+  
+      <template id="wrapper" is="auto-binding">
+ 
+      <template if="{{ state == 'pre-live' }}">
+        <div id="live-input">
+          
+           <paper-input-decorator>
+             <small>Title: </small><input id="video-title" type="text" value="{{videoTitle}}">
+           </paper-input-decorator>
+           <paper-input-decorator >
+             <small>Description: </small><input id="video-description" type="text" value="{{description}}">
+           </paper-input-decorator>
+	       <small>Privacy:</small>
+	       <paper-dropdown-menu selected="{{privacyStatus}}" valueattr="label">
+	                <paper-item label="private"></paper-item>	                
+	                <paper-item label="unlisted"></paper-item>	                
+	                <paper-item label="public"></paper-item>
+	       </paper-dropdown-menu>
+        </div>
+
+      </template>
+      <br><rpi-youtube-livestreaming
+        style="display: {{ (state == 'pre-live') ? 'block' : 'none' }}"
+        clientId="559374416128-crj02g3lj6igqrmla1ob8p0mjtg1ln52.apps.googleusercontent.com"
+        videoTitle="{{videoTitle}}"
+        description="{{description}}"
+        privacyStatus="{{privacyStatus}}"
+        videoId="{{videoId}}"
+		broadcastId="{{broadcastId}}"
+		StreamId="{{streamId}}"		
+		streamName="{{streamName}}"
+        on-youtube-broadcast-created="{{handleYouTubeLiveBroadcastCreated}}"
+        on-youtube-stream-created="{{handleYouTubeLiveStreamCreated}}"
+        on-youtube-stream-binded="{{handleYouTubeLiveStreamBinded}}"
+        on-youtube-transition-testing="{{handleYouTubeLiveTransitionTesting}}"
+        on-youtube-transition-live="{{handleYouTubeLiveTransitionLive}}"
+        on-youtube-live-on-air="{{handleYouTubeLiveOnAir}}">
+      </rpi-youtube-livestreaming>
+      <template if="{{ state == 'handleYouTubeLiveBroadcastCreated' }}">
+        <div>
+			YouTube Live Event Created <br><br />
+			Video ID: {{videoId}} <br />	
+			Watch Url: <a href="http://www.youtube.com/watch?v={{videoId}}" target="_blank">http://www.youtube.com/watch?v={{videoId}}</a>	
+	
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveStreamCreated' }}">
+        <div>
+			YouTube Live Stream Created <br><br />
+			Video ID: {{videoId}} <br />		
+			Watch Url: <a href="http://www.youtube.com/watch?v={{videoId}}" target="_blank">http://www.youtube.com/watch?v={{videoId}}</a>	
+		</div>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveStreamBinded' }}">
+        <div>
+			YouTube Live Broadcast Ready.  Waiting for stream... <br><br />
+			Video ID: {{videoId}} <br />	
+			Watch Url: <a href="http://www.youtube.com/watch?v={{videoId}}" target="_blank">http://www.youtube.com/watch?v={{videoId}}</a>	
+		</div>
+			<br><google-youtube videoId="{{videoId}}" autoplay="1"></google-youtube>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveTransitionTesting' }}">
+        <div>
+			YouTube live stream received.  Testing stream... <br><br />
+			Video ID: {{videoId}} <br />		
+			Watch Url: <a href="http://www.youtube.com/watch?v={{videoId}}" target="_blank">http://www.youtube.com/watch?v={{videoId}}</a>	
+		</div>
+		    <br><google-youtube videoId="{{videoId}}" autoplay="1"></google-youtube>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveTransitionLive' }}">
+        <div>
+			YouTube streaming testing complete.  Preparing to go live... <br><br />
+			Video ID: {{videoId}} <br />		
+			Watch Url: <a href="http://www.youtube.com/watch?v={{videoId}}" target="_blank">http://www.youtube.com/watch?v={{videoId}}</a>	
+		</div>
+		    <br><google-youtube videoId="{{videoId}}" autoplay="1"></google-youtube>
+      </template>
+
+      <template if="{{ state == 'handleYouTubeLiveOnAir' }}">
+        <div>
+			YouTube is now live streaming.   <br><br />
+			Video ID: {{videoId}} <br />		
+			Watch Url: <a href="http://www.youtube.com/watch?v={{videoId}}" target="_blank">http://www.youtube.com/watch?v={{videoId}}</a>	
+        </div>
+		<br><google-youtube videoId="{{videoId}}" autoplay="1"></google-youtube>
+		<div>
+			Video Title: {{videoTitle}} <br />
+			Description: {{description}} <br />
+			Privacy Status: {{privacyStatus}} <br />
+		</div>
+      </template>
+
+      <template if="{{ state == 'error' }}">
+        <p>{{error}}</p>
+      </template>
+
+    </template>
+
+    <script>
+      var template = document.getElementById('wrapper');
+      template.state = 'pre-live';
+
+      template.handleYouTubeLiveBroadcastCreated = function(e) {
+        template.state = 'handleYouTubeLiveBroadcastCreated';
+      };
+      template.handleYouTubeLiveStreamCreated = function(e) {
+        template.state = 'handleYouTubeLiveStreamCreated';
+      };
+      template.handleYouTubeLiveStreamBinded = function(e) {
+        template.state = 'handleYouTubeLiveStreamBinded';
+      };
+      template.handleYouTubeLiveTransitionTesting = function(e) {
+        template.state = 'handleYouTubeLiveTransitionTesting';
+      };
+      template.handleYouTubeLiveTransitionLive = function(e) {
+        template.state = 'handleYouTubeLiveTransitionLive';
+      };
+      template.handleYouTubeLiveOnAir = function(e) {
+        template.state = 'handleYouTubeLiveOnAir';
+      };
+    </script>
+  </div>
+  <div>
+
+	 <paper-input-decorator>
+		  <small>Pi Camera Server Url: </small><input id="rpi-server" type="text" value="http://73.170.145.87:8001">
+	 </paper-input-decorator>
+
+     <div horizontal center layout>
+	   <paper-input-decorator>
+			<small>RTMP Stream Name: </small><input id="rpi-rtmp" value="tobinperry.0qxa-deb1-b3dq-fdc6">
+	   </paper-input-decorator>
+	 </div>
+	 <br>
+	 <div horizontal center layout>
+	   <go-live-button raised affirmative autofocus >Start Stream</go-live-button>
+		<!-- <paper-input value="filename.mp4" label="Upload video to YouTube:" floatingLabel></paper-input> -->
+	   <kill-button raised >Stop Encoder</kill-button>
+       <br><div id="stream-response"></div>
+     </div>
+  </div>
+</core-pages>
+
+<script>
+function loadpic()
+{
+	var width = document.querySelector('width-slider');
+    var height = document.querySelector('height-slider');
+    var exposure = document.querySelector('exposure-dropdown-menu');
+    var effect = document.querySelector('effect-dropdown-menu');
+    var awb = document.querySelector('awb-dropdown-menu');
+    var shutter = document.querySelector('shutter-slider');
+    var iso = document.querySelector('iso-dropdown-menu');
+    var drc = document.querySelector('drc-dropdown-menu');
+    var brightness = document.querySelector('brightness-slider');
+    var sharpness = document.querySelector('sharpness-slider');
+    
+    url = $("#rpi-server").val();
+    url += "/camera";
+ 
+	if (typeof width.value === 'undefined') width.value = 800;
+	if (typeof height.value === 'undefined') height.value = 600;
+   	
+   	camurl = url + "?width=" + width.value + "&height=" + height.value + '&' + Math.random();
+
+	if (typeof exposure.selected != 'undefined') {
+ 		camurl += "&exposure=" + exposure.selected;
+ 	}
+	if (exposure.selected == 'manual') {
+		camurl += "&shutter=" + shutter.value;
+	}
+	if (typeof iso.selected != 'undefined') {
+ 		camurl += "&iso=" + iso.selected;
+ 	}
+  	if (typeof drc.selected != 'undefined') {
+ 		camurl += "&drc=" + drc.selected;
+ 	}
+ 	if (typeof effect.selected != 'undefined') {
+ 		camurl += "&ifx=" + effect.selected;
+ 	}
+ 	if (typeof awb.selected != 'undefined') {
+ 		camurl += "&awb=" + awb.selected;
+ 	}
+ 	if (typeof sharpness.value != 'undefined') {
+ 		camurl += "&sharpness=" + sharpness.value;
+ 	}
+ 	if (typeof brightness.value != 'undefined') {
+ 		camurl += "&brightness=" + brightness.value;
+ 	}
+   	html = "<img id='image' src=" + camurl + " alt='Cannot connect to Pi Camera'>";
+	console.log(camurl);
+	$("#cam").html(html);
+}
+
+var dialog = document.querySelector('paper-dialog');
+var tabs = document.querySelector("paper-tabs");
+var pages = document.querySelector("core-pages");
+var exposure = document.querySelector('exposure-dropdown-menu');
+var shutter = document.querySelector('shutter-slider');
+var accept = document.querySelector('accept-button');
+var fab = document.querySelector('paper-fab');
+var golive = document.querySelector('go-live-button');
+var rtmp = document.querySelector('#rpi-rtmp');
+var killbtn = document.querySelector('kill-button');
+var rpiserver = document.querySelector('#rpi-server')
+
+//
+// save rpi server and rtmp addresses
+//
+rpiserver.addEventListener('change', function() {
+	setCookie('rpiserver',rpiserver.value,90);
+});
+rtmp.addEventListener('change', function() {
+	setCookie('rpirtmp',rtmp.value,90);
+});
+
+// 
+// kill stops encoder (ffmpeg)
+//
+killbtn.addEventListener('click', function() {
+	// Call script on Raspberry Pi
+	var xmlHttp = null;
+	xmlHttp = new XMLHttpRequest();
+	
+	url = $("#rpi-server").val();
+    url += "/kill";
+	xmlHttp.open("GET", url , false);
+    
+	xmlHttp.send( null );
+	$("#stream-response").html(xmlHttp.responseText);
+});
+
+
+//
+// Change tabs
+//
+tabs.addEventListener("core-select", function() {
+  pages.selected = tabs.selected;
+});
+
+
+//
+// Run encoder with rpi-server address
+//
+golive.addEventListener('click', function() {
+	// Call script on Raspberry Pi
+	var xmlHttp = null;
+	xmlHttp = new XMLHttpRequest();
+		
+	url = $("#rpi-server").val();
+    url += "/live";
+  	
+	xmlHttp.open("GET", url + "?id=" + rtmp.value, false);
+	xmlHttp.send( null );
+	console.log("start encoder " + xmlHttp.responseText);
+	$("#stream-response").html(xmlHttp.responseText);
+});
+
+
+//
+//  Open camera settings
+//
+fab.addEventListener('click', function() {
+  	dialog.opened = true;
+});
+
+//
+// Reload picture when clicked
+//
+$('#cam').click(function() {
+	document.querySelector('#picture-toast-message').show();
+	loadpic();
+});
+
+//
+// Reload picture when dialog is ok'd
+//
+accept.addEventListener('click', function() {
+	document.querySelector('#picture-toast-message').show();
+  	loadpic();
+});
+
+//
+// exposure dialog selection
+//
+exposure.addEventListener('core-select', function(data) {
+  	if (data.detail.isSelected) {
+  		if (exposure.selected == "manual") {
+  			shutter.disabled = false;
+  			shutter.editable = true;
+  		}
+  		else {
+   			shutter.disabled = true;
+  			shutter.editable = false;
+  		}
+ 	}
+});
+
+//
+// save cookie
+//
+
+function setCookie(cname,cvalue,exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname+"="+cvalue+"; "+expires;
+}
+//
+// get cookie
+//
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) != -1) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+
+//
+// LOAD INITIAL PICTURE
+//
+// Check cookie for url
+//
+
+serverUrl = getCookie("rpiserver");
+rtmpName = getCookie("rpirtmp");
+if (serverUrl != "") $("#rpi-server").val(serverUrl);
+if (rtmpName != "") $("#rpi-rtmp").val(rtmpName);
+loadpic();
+
+</script>  
+
+
+</body>
+</html>
+ 
