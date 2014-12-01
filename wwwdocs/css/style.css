@@ -1,0 +1,14 @@
+
+@import url(//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css);
+@import url(//fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic);
+
+body {
+	margin: 15px;
+	font-family: 'PT Sans', sans-serif;
+	font-weight: 400;
+}
+
+.navbar-brand img {
+	position: relative;
+	top: -5px;
+}

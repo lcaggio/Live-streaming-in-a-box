@@ -51,6 +51,32 @@
       location = "group:wwwdocs"
       name = "wwwdocs">
       <FileRef
+         location = "group:apitest.html">
+      </FileRef>
+      <Group
+         location = "group:img"
+         name = "img">
+         <FileRef
+            location = "group:youtube-logo-59x32.png">
+         </FileRef>
+      </Group>
+      <Group
+         location = "group:css"
+         name = "css">
+         <FileRef
+            location = "group:style.css">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:livestreaming-config.html">
+      </FileRef>
+      <FileRef
+         location = "group:stream-control.html">
+      </FileRef>
+      <FileRef
+         location = "group:wifi-config.php">
+      </FileRef>
+      <FileRef
          location = "group:bower.json">
       </FileRef>
       <Group
@@ -4204,6 +4230,12 @@
       </FileRef>
       <FileRef
          location = "group:wifi-configuration.html">
+      </FileRef>
+      <FileRef
+         location = "group:robots.txt">
+      </FileRef>
+      <FileRef
+         location = "group:favicon.ico">
       </FileRef>
    </Group>
    <Group
