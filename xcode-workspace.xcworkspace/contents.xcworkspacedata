@@ -67,6 +67,13 @@
             location = "group:style.css">
          </FileRef>
       </Group>
+      <Group
+         location = "group:js"
+         name = "js">
+         <FileRef
+            location = "group:apitest.js">
+         </FileRef>
+      </Group>
       <FileRef
          location = "group:livestreaming-config.html">
       </FileRef>
@@ -4233,9 +4240,6 @@
       </FileRef>
       <FileRef
          location = "group:robots.txt">
-      </FileRef>
-      <FileRef
-         location = "group:favicon.ico">
       </FileRef>
    </Group>
    <Group

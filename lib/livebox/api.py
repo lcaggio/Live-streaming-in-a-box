@@ -63,6 +63,8 @@ class APIRequest(webserver.Request):
 		if not isinstance(body,dict):
 			raise webserver.Error("Invalid control information",webserver.HTTP_STATUS_BADREQUEST)
 
+		logging.debug("handler_put_control: %s" % body)
+
 		# Test properties
 		for control in (Control(),self.server.control):
 			""" We reverse sort the keys so resolution gets set before bitrate """

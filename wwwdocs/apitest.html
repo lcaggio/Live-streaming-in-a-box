@@ -9,6 +9,8 @@
 	<link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
 	<link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
 	
+	<script src="/js/apitest.js" type="text/javascript"></script>
+	
 </head>
 <body>
 
@@ -30,7 +32,56 @@
 		</div>
 	</nav>
 
-	<!-- Status information -->
-	
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 col-md-6">
+		<h2>Control</h2>
+		<pre id="control-body"></pre>
+
+		
+		<form role="form" action="/api/v1/control" method="POST">
+			<div class="form-group">
+				<label for="url">URL</label>
+				<input type="text" class="form-control" id="url" placeholder="Ingress URL">
+			</div>
+
+			<div class="form-group">
+				Resolution: 
+				<label class="radio-inline">
+					<input type="radio" name="resolution" value="240p">240p
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="resolution" value="360p">360p
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="resolution" value="480p">480p
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="resolution" value="720p">720p
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="resolution" value="1080p">1080p
+				</label>
+			</div>
+
+
+
+			<button type="submit" class="btn btn-default">Submit</button>
+		</form>
+
+		<p>
+			<button type="button" class="btn btn-primary btn-lg">Start</button>
+			<button type="button" class="btn btn-default btn-lg">Stop</button>
+			<button type="button" class="btn btn-default btn-lg">Shutdown</button>
+		</p>
+
+    </div>
+    <div class="col-sm-9 col-md-6">
+		<h2>Status</h2>
+		<pre id="status-body"></pre>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
