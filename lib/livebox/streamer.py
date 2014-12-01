@@ -20,12 +20,11 @@ class Streamer(object):
 	def __init__(self,ffmpeg=None):
 		assert isinstance(ffmpeg,basestring) and ffmpeg
 		assert os.path.exists(ffmpeg) and os.path.isfile(ffmpeg)
-		#assert isinstance(audio_flags,tuple)
 		self._ffmpeg = ffmpeg
-		self._audio_flags = "" # audio_flags
 		self.running = False
 		self._queue = Queue.Queue()
 	
+	""" Private methods """
 	def _ffmpeg_output(self,process):
 		logging.info("_ffmpeg_output started")
 		line = process.stderr.readline()
@@ -43,25 +42,41 @@ class Streamer(object):
 			line = process.stderr.readline()
 		logging.info("_ffmpeg_output terminating")
 
+	def _flags_input_audio(self):
+		return [ ]
+
+	def _flags_input_video(self):
+		return [ "-re","-f %s" % constants.CAMERA_FORMAT,"-r %s" % framerate,"-i \"%s\"" % filename ]
+
+	def _flags_output(self):
+		return [
+			"-c:v copy","-b:v %s" % bitrate,"-c:a aac","-b:a %s" % constants.STREAMER_AUDIO_BITRATE,
+			"-map 0:0","-map 1:0","-strict experimental",
+			"-f flv"
+		]
+
+	def start(self,video=None,audio=None,framerate=None,bitrate=None,url=None):
+		assert isinstance(filename,basestring) and filename
+		assert os.path.exists(filename)
+		assert isinstance(framerate,(int,long)) and framerate > 0
+		assert isinstance(bitrate,(int,long)) and bitrate > 0
+		assert isinstance(url,basestring) and url
+	
+		flags = [ ]
+		flags.extend(self._flags_input_video(filename,framerate))
+		flags.extend(self._flags_input_audio(audio))
+		flags.extend(self._flags_output())
+	
+	def stop(self):
+		pass
+
 	def stream(self,filename=None,framerate=None,bitrate=None,url=None):
 		assert isinstance(filename,basestring) and filename
 		assert os.path.exists(filename)
 		assert isinstance(framerate,(int,long)) and framerate > 0
 		assert isinstance(bitrate,(int,long)) and bitrate > 0
 		assert isinstance(url,basestring) and url
-		flags = [ ]
-		flags.extend([
-			"-f %s" % constants.CAMERA_FORMAT,
-			"-r %s" % framerate,
-			"-i \"%s\"" % filename,
-			"-re"
-		])
-		flags.extend(self._audio_flags)
-		flags.extend([
-			"-c:v copy","-b:v %s" % bitrate,"-c:a aac","-b:a %s" % constants.STREAMER_AUDIO_BITRATE,
-			"-map 0:0","-map 1:0","-strict experimental",
-			"-f flv"
-		])
+		flags.extend()
 		flags.append(url)
 		# open the subprocess
 		ffmpeg = [ self._ffmpeg ]

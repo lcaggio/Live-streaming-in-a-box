@@ -45,13 +45,14 @@ function AJAXResponse(request) {
 }
 
 function AJAX() {
-	this.init = function (method,url,callback_success,callback_error) {
+	this.init = function (method,url,data,callback_success,callback_error) {
 		this._callback_success = callback_success;
 		this._callback_error = callback_error;
 		var request =  new XMLHttpRequest();
 		request.onreadystatechange = this.on_request_statechange.bind(this);
 		request.open(method,url,true);
-		request.send();
+		request.send(data);
+		console.log("AJAX: " + method + " " + url);
 	}
 	this.on_request_statechange = function(event) {
 		var request = event.currentTarget;
@@ -83,18 +84,25 @@ function Livebox() {
 		this.doControlTimer();
 		// start calling status
 		window.setInterval(this.doStatusTimer.bind(this),STATUS_INTERVAL);
+		return this;
 	}
 	this.doStatusTimer = function() {
-		new AJAX().init("GET","/api/v1/status",this.doStatusResponse.bind(this));
+		new AJAX().init("GET","/api/v1/status",null,this.doStatusResponse.bind(this),this.doErrorResponse.bind(this));
 	}
 	this.doControlTimer = function() {
-		new AJAX().init("GET","/api/v1/control",this.doControlResponse.bind(this));
+		new AJAX().init("GET","/api/v1/control",null,this.doControlResponse.bind(this),this.doErrorResponse.bind(this));
+	}
+	this.doControlPost = function(evt) {
+		var data = new FormData(evt.srcElement);
+		new AJAX().init("POST","/api/v1/control",data,this.doControlResponse.bind(this),this.doErrorResponse.bind(this));
+		this.doErrorClear();
+		return false;
 	}
 	this.doStatusResponse = function(response) {
 		// replace status element
-		var statusNode = document.getElementById('status-body');
-		if(statusNode) {
-			statusNode.innerText = response.body;
+		var node = document.getElementById('status-body');
+		if(node) {
+			node.innerText = response.body;
 		}
 	}
 	this.doControlResponse = function(response) {
@@ -103,10 +111,74 @@ function Livebox() {
 		if(node) {
 			node.innerText = response.body;
 		}
+		// set form values
+		var form = document.getElementById('control-form');
+		var json = response.json();
+		if(form && json) {
+			form.url.value = json.url;
+			form.resolution.value = json.resolution;
+			form.framerate.value = json.framerate;
+			form.audio.value = json.audio;
+			form.quality.value = json.quality ? json.quality : 0;
+		}
+	}
+	this.doErrorResponse = function(response) {
+		var node = document.getElementById('alert-box');
+		var textnode = document.getElementById('alert-text');
+		var buttonnode = document.getElementById('alert-button');
+		if(node) {
+			node.style.display = "block";
+		}
+		if(buttonnode) {
+			buttonnode.onclick = this.doErrorClear.bind(this);
+		}
+		if(response.is_json()) {
+			var json = response.json();
+			textnode.innerText = "Error: " + json.reason;
+		} else {
+			textnode.innerText = "Error: " + response.statusText;
+		}
+	}
+	this.doErrorClear = function() {
+		var node = document.getElementById('alert-box');
+		if(node) {
+			node.style.display = "none";
+		}
+	}
+	this.doStart = function () {
+		new AJAX().init("GET","/api/v1/start",null,null,this.doErrorResponse.bind(this));
+	}
+	this.doStop = function () {
+		new AJAX().init("GET","/api/v1/stop",null,null,this.doErrorResponse.bind(this));
+	}
+	this.doShutdown = function () {
+		new AJAX().init("GET","/api/v1/shutdown",null,null,this.doErrorResponse.bind(this));
 	}
 }
 
 window.onload = function() {
 	var api = new Livebox().init();
+	
+	// link up the form
+	var form = document.getElementById('control-form');
+	if(form) {
+		form.onsubmit = api.doControlPost.bind(api);
+	}
+	
+	// link the buttons
+	var start = document.getElementById('start-button');
+	if(start) {
+		start.onclick = api.doStart.bind(api);
+	}
+	var stop = document.getElementById('stop-button');
+	if(stop) {
+		stop.onclick = api.doStop.bind(api);
+	}
+	var shutdown = document.getElementById('shutdown-button');
+	if(shutdown) {
+		shutdown.onclick = api.doShutdown.bind(api);
+	}
+	
+	
 }
 

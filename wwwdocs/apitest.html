@@ -32,17 +32,30 @@
 		</div>
 	</nav>
 
+<!-- alert -->
+<div class="alert alert-danger alert-dismissible" role="alert" id="alert-box">
+	<button type="button" class="close" id="alert-button">&times;</button>
+	<span id="alert-text"></span>
+</div>
+
+<!-- main page -->
 <div class="container-fluid">
   <div class="row">
     <div class="col-sm-3 col-md-6">
-		<h2>Control</h2>
+		<h2>/api/v1/control</h2>
 		<pre id="control-body"></pre>
 
-		
-		<form role="form" action="/api/v1/control" method="POST">
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Set Parameters (POST)</h3>
+  </div>
+  <div class="panel-body">
+
+		<form role="form" action="/api/v1/control" method="POST" id="control-form">
 			<div class="form-group">
 				<label for="url">URL</label>
-				<input type="text" class="form-control" id="url" placeholder="Ingress URL">
+				<input type="text" class="form-control" name="url" placeholder="Ingress URL">
 			</div>
 
 			<div class="form-group">
@@ -64,21 +77,83 @@
 				</label>
 			</div>
 
+			<div class="form-group">
+				Framerate:
+				<label class="radio-inline">
+					<input type="radio" name="framerate" value="15">15
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="framerate" value="25">25
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="framerate" value="30">30
+				</label>
+			</div>
+
+			<div class="form-group">
+				Audio:
+				<label class="radio-inline">
+					<input type="radio" name="audio" value="silence">Silence
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="audio" value="1kHz">1kHz Tone
+				</label>
+			</div>
 
 
-			<button type="submit" class="btn btn-default">Submit</button>
+			<div class="form-group">
+				Camera Quality:
+				<label class="radio-inline">
+					<input type="radio" name="quality" value="0">Default
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="quality" value="10">10
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="quality" value="20">20
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="quality" value="30">30
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="quality" value="40">40
+				</label>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
 
-		<p>
-			<button type="button" class="btn btn-primary btn-lg">Start</button>
-			<button type="button" class="btn btn-default btn-lg">Stop</button>
-			<button type="button" class="btn btn-default btn-lg">Shutdown</button>
-		</p>
+
+  </div>
+</div>
+		
 
     </div>
     <div class="col-sm-9 col-md-6">
-		<h2>Status</h2>
+		<h2>/api/v1/status</h2>
 		<pre id="status-body"></pre>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Start, Stop, Restart (GET)</h3>
+			</div>
+			<div class="panel-body">
+			
+			<p>
+				<button type="button" class="btn btn-primary" id="start-button">Start</button> /api/v1/start
+			</p>
+			<p>
+				<button type="button" class="btn btn-primary" id="stop-button">Stop</button> /api/v1/stop
+			</p>
+			<p>
+				<button type="button" class="btn btn-primary" id="shutdown-button">Shutdown</button> /api/v1/shutdown
+			</p>
+			
+			</div>
+		</div>
+
+		
+		
     </div>
   </div>
 </div>

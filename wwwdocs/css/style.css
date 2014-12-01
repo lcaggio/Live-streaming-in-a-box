@@ -12,3 +12,7 @@ body {
 	position: relative;
 	top: -5px;
 }
+
+#alert-box {
+	display: none;
+}
