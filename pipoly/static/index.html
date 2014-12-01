@@ -444,7 +444,8 @@ function loadpic()
     var drc = document.querySelector('drc-dropdown-menu');
     var brightness = document.querySelector('brightness-slider');
     var sharpness = document.querySelector('sharpness-slider');
-    
+ 
+   
     url = $("#rpi-server").val();
     url += "/camera";
  
@@ -521,11 +522,23 @@ killbtn.addEventListener('click', function() {
 });
 
 
+tabs.addEventListener('click', function() {
+
+   	
+
+  if (tabs.selected == 0) {
+    loadpic();
+    document.querySelector('#picture-toast-message').show();
+  }
+});
+
 //
 // Change tabs
 //
 tabs.addEventListener("core-select", function() {
   pages.selected = tabs.selected;
+  
+
 });
 
 
@@ -558,8 +571,8 @@ fab.addEventListener('click', function() {
 // Reload picture when clicked
 //
 $('#cam').click(function() {
-	document.querySelector('#picture-toast-message').show();
 	loadpic();
+	document.querySelector('#picture-toast-message').show();
 });
 
 //
