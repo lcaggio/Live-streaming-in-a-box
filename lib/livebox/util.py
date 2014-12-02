@@ -110,4 +110,9 @@ def get_framesize_for_resolution(value):
 			return (tuple[1],tuple[2])
 	return None
 
+def get_flags_for_audio(value):
+	for tuple in constants.STREAMER_AUDIO:
+		if tuple[0]==value:
+			return tuple[1:]
+	return None
 

@@ -156,13 +156,13 @@ function Livebox() {
 		}
 	}
 	this.doStart = function () {
-		new AJAX().init("GET","/api/v1/start",null,null,this.doErrorResponse.bind(this));
+		new AJAX().init("GET","/api/v1/start",null,this.doStatusResponse.bind(this),this.doErrorResponse.bind(this));
 	}
 	this.doStop = function () {
-		new AJAX().init("GET","/api/v1/stop",null,null,this.doErrorResponse.bind(this));
+		new AJAX().init("GET","/api/v1/stop",null,this.doStatusResponse.bind(this),this.doErrorResponse.bind(this));
 	}
 	this.doShutdown = function () {
-		new AJAX().init("GET","/api/v1/shutdown",null,null,this.doErrorResponse.bind(this));
+		new AJAX().init("GET","/api/v1/shutdown",null,this.doStatusResponse.bind(this),this.doErrorResponse.bind(this));
 	}
 	this.doUpdateButtonState = function(state) {
 		var start = document.getElementById('start-button');
@@ -179,8 +179,12 @@ function Livebox() {
 			stop.disabled = true;
 			control.disabled = false;
 			shutdown.disabled = false;
+		} else if(state.status=="running") {
+			start.disabled = true;
+			stop.disabled = false;
+			control.disabled = true;
+			shutdown.disabled = false;
 		} else {
-			// TODO: need to deal with the preparing and streaming states
 			start.disabled = true;
 			stop.disabled = true;
 			control.disabled = true;

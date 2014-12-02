@@ -11,22 +11,45 @@ __author__ = "davidthorpe@google.com (David Thorpe)"
 import os,logging, subprocess, threading, Queue, time, re
 
 # Local imports
-from . import constants
+from . import util,constants,Control
 
 ################################################################################
-# Streamer class
+
+class Error(Exception):
+	pass
+
+################################################################################
 
 class Streamer(object):
 	def __init__(self,ffmpeg=None):
 		assert isinstance(ffmpeg,basestring) and ffmpeg
 		assert os.path.exists(ffmpeg) and os.path.isfile(ffmpeg)
 		self._ffmpeg = ffmpeg
-		self.running = False
+		self._input = None
 		self._queue = Queue.Queue()
+	
+	""" Properties """
+	def set_input(self,value):
+		assert value==None or isinstance(value,basestring) and value
+		if value==None:
+			self._input = None
+		else:
+			self._input = value
+	def get_input(self):
+		return self._input
+	input = property(get_input,set_input)
+
+	def get_running(self):
+		if self._input:
+			return True
+		else:
+			return False
+	running = property(get_running)
+	
 	
 	""" Private methods """
 	def _ffmpeg_output(self,process):
-		logging.info("_ffmpeg_output started")
+		logging.debug("_ffmpeg_output started")
 		line = process.stderr.readline()
 		while line:
 			m = re.match(r"\s*frame=\s*(\S+)\s+fps=\s*(\S+)\s+q=(\S+)\s+size=\s*(\S+)\s+time=\s*(\S*)\s+bitrate=\s*(\S*)",line)
@@ -40,35 +63,45 @@ class Streamer(object):
 					"bitrate": m.group(6)
 				})
 			line = process.stderr.readline()
-		logging.info("_ffmpeg_output terminating")
+		logging.debug("_ffmpeg_output terminating")
 
-	def _flags_input_audio(self):
-		return [ ]
+	def _flags_input_audio(self,control):
+		assert isinstance(control,Control)
+		return util.get_flags_for_audio(control.audio)
 
-	def _flags_input_video(self):
-		return [ "-re","-f %s" % constants.CAMERA_FORMAT,"-r %s" % framerate,"-i \"%s\"" % filename ]
+	def _flags_input_video(self,control):
+		assert isinstance(control,Control)
+		return [ "-re","-f %s" % constants.CAMERA_FORMAT,"-r %s" % control.framerate,"-i \"%s\"" % self._input ]
 
-	def _flags_output(self):
+	def _flags_output(self,control):
+		assert isinstance(control,Control)
 		return [
-			"-c:v copy","-b:v %s" % bitrate,"-c:a aac","-b:a %s" % constants.STREAMER_AUDIO_BITRATE,
+			"-c:v copy","-b:v %s" % control.bitrate,"-c:a aac","-b:a %s" % constants.STREAMER_AUDIO_BITRATE,
 			"-map 0:0","-map 1:0","-strict experimental",
 			"-f flv"
 		]
 
-	def start(self,video=None,audio=None,framerate=None,bitrate=None,url=None):
+	def start(self,filename,control):
 		assert isinstance(filename,basestring) and filename
 		assert os.path.exists(filename)
-		assert isinstance(framerate,(int,long)) and framerate > 0
-		assert isinstance(bitrate,(int,long)) and bitrate > 0
-		assert isinstance(url,basestring) and url
+		assert isinstance(control,Control)
+
+		""" Get parameters """
+		if self.running:
+			raise Error("Internal error: Invalid state")
+	
+		# Open input file
+		self.input = filename
 	
 		flags = [ ]
-		flags.extend(self._flags_input_video(filename,framerate))
-		flags.extend(self._flags_input_audio(audio))
-		flags.extend(self._flags_output())
+		flags.extend(self._flags_input_video(control))
+		flags.extend(self._flags_input_audio(control))
+		flags.extend(self._flags_output(control))
+		
+		logging.debug("start: flags: %s" % flags)
 	
 	def stop(self):
-		pass
+		self.input = None
 
 	def stream(self,filename=None,framerate=None,bitrate=None,url=None):
 		assert isinstance(filename,basestring) and filename

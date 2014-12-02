@@ -85,10 +85,12 @@ class APIRequest(webserver.Request):
 	def handler_start_streamer(self):
 		""" Start streaming from the camera """
 		self.server.streamer_start()
+		return self.handler_status()
 
 	def handler_stop_streamer(self):
 		""" Stop streaming from the camera """
 		self.server.streamer_stop()
+		return self.handler_status()
 
 	def handler_status(self):
 		return {
@@ -96,12 +98,13 @@ class APIRequest(webserver.Request):
 			"version": constants.PRODUCT_VERSION,
 			"timestamp": datetime.datetime.now().isoformat(),
 			"name": self.server.server_name,
-			"status": "idle",
+			"status": self.server.state,
 			"system": util.system_info()
 		}
 
 	def handler_shutdown(self):
 		self.server.running = False
+		return self.handler_status()
 
 	ROUTES = (
 		(webserver.HTTP_METHOD_GET,"v1/status",handler_status),
@@ -123,32 +126,34 @@ class APIServer(webserver.Server):
 		self.camera = camera.Camera()
 		self.streamer = streamer.Streamer(ffmpeg=os.path.join(package_path,constants.STREAMER_EXEC))
 
+	""" Properties """
+	def get_state(self):
+		if not self.camera.running and not self.streamer.running:
+			return "idle"
+		else:
+			return "running"
+	state = property(get_state)
+	
+	""" Public methods """
 	def run(self):
 		logging.debug("run(): starting runloop, fifo=%s" % self.fifo.filename)
 		webserver.Server.run(self)
 		self.fifo.close()
 		logging.debug("run(): stopped runloop")
 
-	def camera_start(self):
-		logging.debug("Starting camera")
-		try:
-			self.camera.start(self.fifo.filename,self.control)
-		except camera.Error, e:
-			raise webserver.Error("%s" % e,webserver.HTTP_STATUS_SERVERERROR)
-
-	def camera_stop(self):
-		try:
-			self.camera.stop()
-		except camera.Error, e:
-			raise webserver.Error("%s" % e,webserver.HTTP_STATUS_SERVERERROR)
-
 	def streamer_start(self):
-		self.camera_start()
-		pass
+		try:
+			self.streamer.start(self.fifo.filename,self.control)
+			self.camera.start(self.fifo.filename,self.control)
+		except (camera.Error,streamer.Error), e:
+			raise webserver.Error("streamer_start: %s" % e,webserver.HTTP_STATUS_SERVERERROR)
 
 	def streamer_stop(self):
-		self.camera_stop()
-		pass
+		try:
+			self.streamer.stop()
+			self.camera.stop()
+		except (camera.Error,streamer.Error), e:
+			raise webserver.Error("streamer_stop: %s" % e,webserver.HTTP_STATUS_SERVERERROR)
 
 
 
