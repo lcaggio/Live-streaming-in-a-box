@@ -83,6 +83,21 @@ def parse_bitrate(value):
 			if v > 0: return v
 	return None
 
+def parse_boolean(value):
+	""" Returns a boolean value """
+	if isinstance(value,(bool,int,long)):
+		return bool(value)
+	if isinstance(value,basestring):
+		if not value:
+			return False
+		m = re.match(r"^\s*(0|f|F|false|False|FALSE|n|N|No|NO)\s*$",value)
+		if m:
+			return False
+		m = re.match(r"^\s*(1|t|T|true|True|TRUE|y|Y|Yes|YES)\s*$",value)
+		if m:
+			return True
+	return None
+
 def get_bitrate_for_resolution(value):
 	for tuple in constants.CAMERA_RESOLUTION:
 		if tuple[0]==value:

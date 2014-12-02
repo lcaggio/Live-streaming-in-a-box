@@ -65,7 +65,7 @@ class APIRequest(webserver.Request):
 
 		logging.debug("handler_put_control: %s" % body)
 
-		# Test properties
+		# Test control values, then do it for real
 		for control in (Control(),self.server.control):
 			""" We reverse sort the keys so resolution gets set before bitrate """
 			for key in sorted(body.keys(),reverse=True):
@@ -77,6 +77,7 @@ class APIRequest(webserver.Request):
 					assert hasattr(control,key)
 					setattr(control,key,value)
 				except (AssertionError,ValueError):
+					logging.debug("handler_put_control: exception raised setting value: '%s' => %s" % (key,value))
 					raise webserver.Error("Invalid value for '%s'" % key,webserver.HTTP_STATUS_BADREQUEST)
 		# Return the control structure
 		return self.server.control.as_json()
@@ -131,13 +132,7 @@ class APIServer(webserver.Server):
 	def camera_start(self):
 		logging.debug("Starting camera")
 		try:
-			self.camera.start(
-				filename=self.fifo.filename,
-				framesize=util.get_framesize_for_resolution(self.control.resolution),
-				framerate=self.control.framerate,
-				bitrate=self.control.bitrate,
-				quality=self.control.quality
-			)
+			self.camera.start(self.fifo.filename,self.control)
 		except camera.Error, e:
 			raise webserver.Error("%s" % e,webserver.HTTP_STATUS_SERVERERROR)
 

@@ -3,7 +3,6 @@
 
 # Python imports
 from urlparse import urlparse
-import pprint
 
 # Local imports
 from . import constants,util
@@ -21,6 +20,8 @@ class Control(object):
 		self.audio = constants.STREAMER_AUDIO[0][0]
 		self.framerate = constants.CAMERA_FRAMERATE
 		self.quality = constants.CAMERA_QUALITY
+		self.hflip = False
+		self.vflip = False
 
 	""" Properties """
 	def get_url(self):
@@ -119,6 +120,24 @@ class Control(object):
 		self._quality = quality
 	quality = property(get_quality,set_quality)
 
+	def get_hflip(self):
+		return self._hflip
+	def set_hflip(self,value):
+		value = util.parse_boolean(value)
+		if not isinstance(value,bool):
+			raise ValueError("Invalid 'hflip' value")
+		self._hflip = value
+	hflip = property(get_hflip,set_hflip)
+
+	def get_vflip(self):
+		return self._vflip
+	def set_vflip(self,value):
+		value = util.parse_boolean(value)
+		if not isinstance(value,bool):
+			raise ValueError("Invalid 'vflip' value")
+		self._vflip = value
+	vflip = property(get_vflip,set_vflip)
+
 	""" Methods """
 	def as_json(self):
 		return {
@@ -128,10 +147,7 @@ class Control(object):
 			'video': self.video,
 			'audio': self.audio,
 			'framerate': self.framerate,
-			'quality': self.quality
+			'quality': self.quality,
+			'hflip': self.hflip,
+			'vflip': self.vflip
 		}
-
-	def __str__(self):
-		return pprint.pformat(self._config)
-
-

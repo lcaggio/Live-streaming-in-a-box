@@ -1,5 +1,6 @@
 
 var STATUS_INTERVAL = 5 * 1000; // 5 secs
+var CONTROL_INTERVAL = 10 * 1000; // 10 secs
 
 function AJAXResponse(request) {
 	this.status = request.status;
@@ -82,8 +83,9 @@ function Livebox() {
 	this.init = function () {
 		this.doStatusTimer();
 		this.doControlTimer();
-		// start calling status
+		// start intervals
 		window.setInterval(this.doStatusTimer.bind(this),STATUS_INTERVAL);
+		window.setInterval(this.doControlTimer.bind(this),CONTROL_INTERVAL);
 		return this;
 	}
 	this.doStatusTimer = function() {
@@ -104,6 +106,12 @@ function Livebox() {
 		if(node) {
 			node.innerText = response.body;
 		}
+		// update button states
+		var json = response.json();
+		if(json) {
+			this.doUpdateButtonState(json);
+		}
+
 	}
 	this.doControlResponse = function(response) {
 		// replace status element
@@ -120,6 +128,8 @@ function Livebox() {
 			form.framerate.value = json.framerate;
 			form.audio.value = json.audio;
 			form.quality.value = json.quality ? json.quality : 0;
+			form.hflip.value = json.hflip ? 1 : 0
+			form.vflip.value = json.vflip ? 1 : 0
 		}
 	}
 	this.doErrorResponse = function(response) {
@@ -154,6 +164,29 @@ function Livebox() {
 	this.doShutdown = function () {
 		new AJAX().init("GET","/api/v1/shutdown",null,null,this.doErrorResponse.bind(this));
 	}
+	this.doUpdateButtonState = function(state) {
+		var start = document.getElementById('start-button');
+		var stop = document.getElementById('stop-button');
+		var shutdown = document.getElementById('shutdown-button');
+		var control = document.getElementById('control-button');
+
+		start.onclick = this.doStart.bind(this);
+		stop.onclick = this.doStop.bind(this);
+		shutdown.onclick = this.doShutdown.bind(this);
+		
+		if(state.status=="idle") {
+			start.disabled = false;
+			stop.disabled = true;
+			control.disabled = false;
+			shutdown.disabled = false;
+		} else {
+			// TODO: need to deal with the preparing and streaming states
+			start.disabled = true;
+			stop.disabled = true;
+			control.disabled = true;
+			shutdown.disabled = true;
+		}
+	}
 }
 
 window.onload = function() {
@@ -165,19 +198,6 @@ window.onload = function() {
 		form.onsubmit = api.doControlPost.bind(api);
 	}
 	
-	// link the buttons
-	var start = document.getElementById('start-button');
-	if(start) {
-		start.onclick = api.doStart.bind(api);
-	}
-	var stop = document.getElementById('stop-button');
-	if(stop) {
-		stop.onclick = api.doStop.bind(api);
-	}
-	var shutdown = document.getElementById('shutdown-button');
-	if(shutdown) {
-		shutdown.onclick = api.doShutdown.bind(api);
-	}
 	
 	
 }

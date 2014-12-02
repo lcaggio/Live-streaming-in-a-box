@@ -8,7 +8,7 @@
 __author__ = "davidthorpe@google.com (David Thorpe)"
 
 # Python imports
-import io,logging
+import io,os,logging
 
 # Optional picamera import
 IMPORT_PICAMERA = True
@@ -18,7 +18,7 @@ except ImportError, e:
 	IMPORT_PICAMERA = False
 
 # Local imports
-from . import constants
+from . import Control,constants,util
 
 ################################################################################
 
@@ -29,17 +29,28 @@ class Error(Exception):
 
 class Camera(object):
 	def __init__(self):
-		self.running = False
 		self._output = None
 		self._camera = None
 
 	""" Properties """
-	def set_running(self,value):
-		assert isinstance(value,bool)
-		self._running = value
+	def set_output(self,value):
+		assert value==None or isinstance(value,basestring) and value
+		if self._output:
+			self._output.close()
+		if value==None:
+			self._output = None
+		else:
+			self._output = io.open(value,"wb",buffering=65536)
+	def get_output(self):
+		return self._output
+	output = property(get_output,set_output)
+
 	def get_running(self):
-		return self._running
-	running = property(get_running,set_running)
+		if self._output:
+			return True
+		else:
+			return False
+	running = property(get_running)
 	
 	""" Private methods """
 	def _camera_init(self):
@@ -53,24 +64,36 @@ class Camera(object):
 			raise Error("%s" % e)
 
 	""" Methods """
-	def start(self,filename=None,framesize=None,framerate=constants.CAMERA_FRAMERATE,bitrate=None,quality=constants.CAMERA_QUALITY,profile=constants.CAMERA_PROFILE[0]):
+	def start(self,filename,control):
 		assert isinstance(filename,basestring) and filename
-		assert isinstance(framesize,tuple) and len(framesize)==2
-		assert isinstance(framerate,int) and framerate > 0
-		assert quality==None or (isinstance(quality,int) and quality > 0)
-		assert isinstance(profile,basestring) and profile in constants.CAMERA_PROFILE
-		assert bitrate==None or (isinstance(bitrate,(int,long)) and bitrate > 0)
+		assert os.path.exists(filename)
+		assert isinstance(control,Control)
 
-		if self._output:
+		""" Get parameters """
+		if self.running:
 			raise Error("Internal error: Invalid state")
-		self._camera_init()
-		self._output = io.open(filename,"wb",buffering=65536)
-		self._camera.resolution = framesize
-		self._camera.framerate = framerate
-		self._camera.start_recording(self._output,format=constants.CAMERA_FORMAT,quality=quality,profile=profile,intra_period=(2*framerate),inline_headers=True,bitrate=bitrate)
-		self.running = True
 
-#				camera.wait_recording(timeout=3600 * 10)
+		# Initialize camera
+		self._camera_init()
+
+		# Open output file
+		self.output = filename
+
+		# Start camera output
+		self._camera.resolution = util.get_framesize_for_resolution(control.resolution)
+		self._camera.framerate = control.framerate
+		self._camera.hflip = control.hflip
+		self._camera.vflip = control.vflip
+		self._camera.start_recording(
+			self.output,
+			format=constants.CAMERA_FORMAT,
+			profile=constants.CAMERA_PROFILE,
+			quality=control.quality,
+			bitrate=control.bitrate,
+			intra_period=(2*framerate),
+			inline_headers=True
+		)
+#		camera.wait_recording(timeout=3600 * 10)
 
 	def stop(self):
 		if not IMPORT_PICAMERA:
@@ -80,7 +103,5 @@ class Camera(object):
 			self._camera.stop_recording()
 		except picamera.exc.PiCameraNotRecording:
 			raise Error("Internal error: Invalid state")
-		self._output.close()
-		self._output = None
-		self.running = False
+		self.output = None
 

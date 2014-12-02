@@ -120,7 +120,27 @@
 				</label>
 			</div>
 
-			<button type="submit" class="btn btn-primary">Submit</button>
+			<div class="form-group">
+				Horizontal Image Flip:
+				<label class="radio-inline">
+					<input type="radio" name="hflip" value="0">Off
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="hflip" value="1">On
+				</label>
+			</div>
+
+			<div class="form-group">
+				Vertical Image Flip:
+				<label class="radio-inline">
+					<input type="radio" name="vflip" value="0">Off
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="vflip" value="1">On
+				</label>
+			</div>
+
+			<button type="submit" class="btn btn-primary" id="control-button">Submit</button>
 		</form>
 
 
@@ -146,7 +166,7 @@
 				<button type="button" class="btn btn-primary" id="stop-button">Stop</button> /api/v1/stop
 			</p>
 			<p>
-				<button type="button" class="btn btn-primary" id="shutdown-button">Shutdown</button> /api/v1/shutdown
+				<button type="button" class="btn btn-primary" id="shutdown-button">Restart</button> /api/v1/shutdown
 			</p>
 			
 			</div>
