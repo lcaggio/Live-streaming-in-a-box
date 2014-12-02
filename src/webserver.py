@@ -10,7 +10,7 @@
 	  --verbose
 	  --bind <interface> | *
 	  --port <port>
-	  --mdns
+	  --ffmpeg <binary>
 	  --docroot <folder>
 	  --temproot <folder>
 	  
@@ -57,17 +57,14 @@ gflags.DEFINE_boolean('verbose',False,"Verbose output")
 gflags.DEFINE_string('bind',livebox.constants.NETWORK_BIND,"Network interface or *")
 gflags.DEFINE_integer('port',livebox.constants.NETWORK_PORT,"Network port")
 gflags.DEFINE_string('wwwroot',os.path.join(root_path,"wwwdocs"),"Web document folder")
+gflags.DEFINE_string('ffmpeg',os.path.join(root_path,livebox.constants.STREAMER_EXEC),"ffmpeg binary")
 #gflags.DEFINE_string('temproot',None,"Temporary file storage folder")
 
 ################################################################################
-# application classes
-
-class Error(Exception):
-	pass
 
 class Application(livebox.api.APIServer):
-	def __init__(self,bind,port,wwwroot):
-		livebox.api.APIServer.__init__(self,root_path,bind,port,wwwroot)
+	def __init__(self,ffmpeg,bind,port,wwwroot):
+		livebox.api.APIServer.__init__(self,ffmpeg,bind,port,wwwroot)
 
 	@property
 	def server_url(self):
@@ -93,9 +90,12 @@ def main(argv):
 			raise Error("Invalid --port parameter")
 		if not os.path.isdir(FLAGS.wwwroot):
 			raise Error("Invalid --wwwroot parameter")
+		if not os.path.isfile(FLAGS.ffmpeg) or not os.access(FLAGS.ffmpeg,os.X_OK):
+			raise Error("Invalid --ffmpeg parameter")
+		
 		
 		# Create application
-		app = Application(FLAGS.bind,FLAGS.port,FLAGS.wwwroot)
+		app = Application(FLAGS.ffmpeg,FLAGS.bind,FLAGS.port,FLAGS.wwwroot)
 
 		# run application
 		logging.info("Serving on %s" % app.server_url)

@@ -65,6 +65,32 @@ class Streamer(object):
 			line = process.stderr.readline()
 		logging.debug("_ffmpeg_output terminating")
 
+	def _ffmpeg_start(self,*flags):
+		logging.debug("execute: %s %s" % (self._ffmpeg," ".join(flags)))
+		proc = subprocess.Popen(
+			"%s %s" % (self._ffmpeg," ".join(flags)),
+			shell=True,
+			universal_newlines=True,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.PIPE
+		)
+		stderr_thread = threading.Thread(target=self._ffmpeg_output,args=(proc,))
+		stderr_thread.daemon = True
+		stderr_thread.start()
+		
+		# wait for subprocess to complete
+		logging.debug("STARTING FFMPEG")
+		while not proc.poll():
+			try:
+				item = self._queue.get(True,1.0)
+				logging.debug("Status: %s" % item)
+			except Queue.Empty:
+				pass
+
+		returncode = proc.poll()
+		logging.debug("COMPLETED FFMPEG, return code %s" % returncode)
+		return returncode	
+
 	def _flags_input_audio(self,control):
 		assert isinstance(control,Control)
 		return util.get_flags_for_audio(control.audio)
@@ -88,8 +114,10 @@ class Streamer(object):
 
 		""" Get parameters """
 		if self.running:
-			raise Error("Internal error: Invalid state")
-	
+			raise Error("Invalid state")
+		if not control.url:
+			raise Error("Invalid URL: %s" % control.url)
+		
 		# Open input file
 		self.input = filename
 	
@@ -97,8 +125,12 @@ class Streamer(object):
 		flags.extend(self._flags_input_video(control))
 		flags.extend(self._flags_input_audio(control))
 		flags.extend(self._flags_output(control))
-		
-		logging.debug("start: flags: %s" % flags)
+		flags.append(control.url)
+	
+		# create background thread to start streaming
+		t = threading.Thread(target=self._ffmpeg_start,args=flags)
+		t.daemon = True
+		t.start()
 	
 	def stop(self):
 		self.input = None
@@ -117,23 +149,6 @@ class Streamer(object):
 		
 		# run the process, and in the background, read the status from stderr
 		logging.debug("Streamer.stream: execute: %s" % " ".join(ffmpeg))
-		proc = subprocess.Popen(" ".join(ffmpeg),shell=True,universal_newlines=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-		stderr_thread = threading.Thread(target=self._ffmpeg_output,args=(proc,))
-		stderr_thread.daemon = True
-		stderr_thread.start()
-		
-		# wait for subprocess to complete
-		logging.debug("STARTING FFMPEG")
-		while not proc.poll():
-			try:
-				item = self._queue.get(True,1.0)
-				logging.debug("Status: %s" % item)
-			except Queue.Empty:
-				pass
-
-		returncode = proc.poll()
-		logging.debug("COMPLETED FFMPEG, return code %s" % returncode)
-		return returncode
 
 
 	

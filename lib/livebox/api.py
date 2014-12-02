@@ -119,12 +119,12 @@ class APIRequest(webserver.Request):
 ################################################################################
 
 class APIServer(webserver.Server):
-	def __init__(self,package_path,*args):
+	def __init__(self,ffmpeg,*args):
 		webserver.Server.__init__(self,*args,request_class=APIRequest)
 		self.control = Control()
 		self.fifo = util.FIFO()
 		self.camera = camera.Camera()
-		self.streamer = streamer.Streamer(ffmpeg=os.path.join(package_path,constants.STREAMER_EXEC))
+		self.streamer = streamer.Streamer(ffmpeg)
 
 	""" Properties """
 	def get_state(self):

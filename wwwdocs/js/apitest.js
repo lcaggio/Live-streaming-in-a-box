@@ -1,6 +1,5 @@
 
 var STATUS_INTERVAL = 5 * 1000; // 5 secs
-var CONTROL_INTERVAL = 10 * 1000; // 10 secs
 
 function AJAXResponse(request) {
 	this.status = request.status;
@@ -85,7 +84,6 @@ function Livebox() {
 		this.doControlTimer();
 		// start intervals
 		window.setInterval(this.doStatusTimer.bind(this),STATUS_INTERVAL);
-		window.setInterval(this.doControlTimer.bind(this),CONTROL_INTERVAL);
 		return this;
 	}
 	this.doStatusTimer = function() {
