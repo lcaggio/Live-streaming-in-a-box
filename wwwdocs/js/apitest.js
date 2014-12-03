@@ -86,6 +86,11 @@ function Livebox() {
 		// start intervals
 		window.setInterval(this.doStatusTimer.bind(this),STATUS_INTERVAL);
 		window.setInterval(this.doControlTimer.bind(this),CONTROL_INTERVAL);
+		// link form
+		var form = document.getElementById('control-form');
+		if(form) {
+			form.onsubmit = this.doControlPost.bind(this);
+		}
 		return this;
 	}
 	this.doStatusTimer = function() {
@@ -196,14 +201,5 @@ function Livebox() {
 
 window.onload = function() {
 	var api = new Livebox().init();
-	
-	// link up the form
-	var form = document.getElementById('control-form');
-	if(form) {
-		form.onsubmit = api.doControlPost.bind(api);
-	}
-	
-	
-	
 }
 
