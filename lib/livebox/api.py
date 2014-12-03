@@ -69,6 +69,10 @@ class APIRequest(webserver.Request):
 		for control in (Control(),self.server.control):
 			""" We reverse sort the keys so resolution gets set before bitrate """
 			for key in sorted(body.keys(),reverse=True):
+				""" ignore the timestamp key """
+				if key=="timestamp":
+					continue
+				""" Find the key """								
 				value = body[key]
 				if isinstance(value,list) and len(value)==1:
 					""" If value is an array with one value in it """

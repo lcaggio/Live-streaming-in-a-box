@@ -1,5 +1,6 @@
 
 var STATUS_INTERVAL = 5 * 1000; // 5 secs
+var CONTROL_INTERVAL = 15 * 1000; // 15 secs
 
 function AJAXResponse(request) {
 	this.status = request.status;
@@ -84,6 +85,7 @@ function Livebox() {
 		this.doControlTimer();
 		// start intervals
 		window.setInterval(this.doStatusTimer.bind(this),STATUS_INTERVAL);
+		window.setInterval(this.doControlTimer.bind(this),CONTROL_INTERVAL);
 		return this;
 	}
 	this.doStatusTimer = function() {
@@ -120,7 +122,8 @@ function Livebox() {
 		// set form values
 		var form = document.getElementById('control-form');
 		var json = response.json();
-		if(form && json) {
+		if(form && json && form.timestamp.value != json.timestamp) {
+			form.timestamp.value = json.timestamp;
 			form.url.value = json.url;
 			form.resolution.value = json.resolution;
 			form.framerate.value = json.framerate;

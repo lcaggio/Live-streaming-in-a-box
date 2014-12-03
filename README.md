@@ -31,10 +31,16 @@ controller remotely. There would be then several UI interfaces:
     batch by a cloud-based web interface
 
 
-Installation
-------------
+Current Status
+--------------
 
-TODO
+As of 3 Dec 2014:
+
+  * For the command-line usage, this needs to be updated so it currently no
+    not working.
+  * For the server usage, the `lib/livebox/streamer.py` and `lib/livebox/camera.py`
+    modules need to be completed. The server version is therefore still under
+	development.
 
 
 Command Line Usage
@@ -75,14 +81,17 @@ The server can be bound to the local interface (thus preventing access via the
 network) or to a particular network interface. The command line switches are as
 follows:
 
-  * `--port 8000` Set the port number to listen for incoming connections on
+  * `--port 8000` Optional. Set the port number to listen for incoming connections on.
   
-  * `--bind * | localhost` Listen to all interfaces or only some interfaces. By
-    setting this to `localhost` you can ensure that only processes on the device
-	itself can send API commands.
+  * `--bind * | localhost` Optional. Listen to all interfaces or only some 
+    interfaces. By setting this to `localhost` you can ensure that only 
+	processes on the device itself can send API commands.
 	
   * `--wwwdocs <folder>` You can set a custom folder to use as the static files
     that can be served by the server. In general, you won't want to set this.
+	
+  * `--ffmpeg <exec>` Optional. You can set the ffmpeg binary to be used for 
+    encoding and streaming.
 
   * `--verbose` Reports more information on the console than usual, for debugging
     purposes.
@@ -111,8 +120,9 @@ Here is what the current status response might look like:
   "product": "com.youtube.livebox",
   "version": "1.0",
   "name": "rpi2.nw1", // hostname or name set otherwise
+  "timestamp": XXXX,  // system time
   "id": "XXXXXXXXX",  // MAC address
-  "status": "idle",   // idle, preparing, streaming, stopping
+  "status": "idle",   // idle, preparing, running, stopping
   "cpu": 32.0,        // CPU percentage used by the software
   "disk": 76.0,       // Temporary storage used in percentage
   "net": 290000       // Outgress in bytes
@@ -123,14 +133,16 @@ Here is what a control message looks like:
 
 ```
 {
-	"name": "djt.zepf-h0qx-1z8d-821q",
-	"url": "rtmp://a.rtmp.youtube.com/live2",
+    "timestamp": XXXX, // time of last update
+	"url": "rtmp://a.rtmp.youtube.com/live2/djt.zepf-h0qx-1z8d-821q",
 	"resolution": "360p",
 	"bitrate": 100000,
 	"video": "picamera",
 	"audio": "1kHz",
 	"fps": 25,
-	"quality": null // use default
+	"quality": null,  // use default
+	"hflip": false,   // horizonal image flip
+	"vflip": false    // vertical image flip
 }
 ```
 
@@ -152,12 +164,13 @@ Other things to consider:
     probably not so necessary on the localhost interface.
   * Have a reliable channel for accessing the remote location to pull down commands
     and return responses. Look here for example: http://schibum.blogspot.co.uk/2011/06/using-google-appengine-channel-api-with.html
+	We should probably use the XMPP standard or something to get and send messages.
   * Want to be able to output to a file on temporary storage, or loop video/audio input from
     a file in temporary storage for output.
 
-
 TEMP
 ----
+
 Solution with 2 wifi adapters. 
  - wlan1: fixed SSID to always access the pi and configure wlan0
  - wlan0: configurable wifi

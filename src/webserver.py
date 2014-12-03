@@ -102,7 +102,7 @@ def main(argv):
 		app.run()
 
 		sys.exit(0)
-	except (Error, gflags.FlagsError), e:
+	except (gflags.FlagsError), e:
 		print "Usage error: %s" % e
 		sys.exit(-1)
 
