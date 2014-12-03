@@ -90,7 +90,7 @@ class Camera(object):
 			profile=constants.CAMERA_PROFILE,
 			quality=control.quality,
 			bitrate=control.bitrate,
-			intra_period=(2*framerate),
+			intra_period=(2*control.framerate),
 			inline_headers=True
 		)
 #		camera.wait_recording(timeout=3600 * 10)
