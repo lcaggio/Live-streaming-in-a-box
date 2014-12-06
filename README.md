@@ -15,7 +15,6 @@ Prerequisite
  * Internet connection (wifi or ethernet)
  * The Raspian operating system (probably) with Python 2.7 and picamera installed
 
-
 Design
 ------
 
@@ -41,6 +40,8 @@ As of 3 Dec 2014:
   * For the server usage, the `lib/livebox/streamer.py` and `lib/livebox/camera.py`
     modules need to be completed. The server version is therefore still under
 	development.
+	
+Further information is provided in the NOTES
 
 
 Command Line Usage
@@ -153,32 +154,17 @@ it will return a OK or Bad Request status depending on whether that's possible.
 There is also a generic webserver which will return anything under the document
 root, as long as the files fetched aren't under the "api" namespace.
 
-TODO
-----
+License
+-------
 
-Other things to consider:
+Copyright 2014-2015 Google Inc.
 
-  * Want to be able to store logs and data in an sqlite database, which can be
-    accessed and analysed later, via the API
-  * Authorization and authentication to be done in the API for network connections,
-    probably not so necessary on the localhost interface.
-  * Have a reliable channel for accessing the remote location to pull down commands
-    and return responses. Look here for example: http://schibum.blogspot.co.uk/2011/06/using-google-appengine-channel-api-with.html
-	We should probably use the XMPP standard or something to get and send messages.
-  * Want to be able to output to a file on temporary storage, or loop video/audio input from
-    a file in temporary storage for output.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
+file except in compliance with the License. You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
 
-TEMP
-----
-
-Solution with 2 wifi adapters. 
- - wlan1: fixed SSID to always access the pi and configure wlan0
- - wlan0: configurable wifi
-To use the UI, you need to:
- - apt-get install lighttpd php5-cgi
- - sudo lighty-enable-mod fastcgi-php
- - /etc/init.d/lighttpd restart
- - Add to /etc/sudoers the following: www-data ALL=(ALL) NOPASSWD:/sbin/ifdown wlan0,/sbin/ifup wlan0,/bin/cat /etc/wpa_supplicant/wpa_supplicant.conf,/bin/cp /tmp/wifidata /etc/wpa_supplicant/wpa_supplicant.conf,/sbin/wpa_cli scan_results,/sbin/wpa_cli scan
-
-Inspired by: http://sirlagz.net/2013/02/06/script-web-configuration-page-for-raspberry-pi/
+Unless required by applicable law or agreed to in writing, software distributed under
+the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ANY KIND, either express or implied. See the License for the specific language governing
+permissions and limitations under the License.
 

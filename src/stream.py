@@ -42,7 +42,7 @@ for path in code_paths:
 # imports
 
 # Python imports
-import logging,pprint
+import logging,pprint,signal,time
 
 # Third party imports
 import gflags
@@ -76,11 +76,30 @@ class Application(object):
 		self.camera = livebox.camera.Camera()
 		self.streamer = livebox.streamer.Streamer(ffmpeg)
 
+		# set signal handlers
+		signal.signal(signal.SIGINT,self.signal_handler)
+		signal.signal(signal.SIGTERM,self.signal_handler)
+
+	""" Properties """
+	@property
+	def running(self):
+		if self.streamer.running:
+			return True
+		return False
+
+	def signal_handler(self,num,stack):
+		logging.debug("Caught signal %d" % num)
+		self.streamer.stop()
+
 	def run(self):
-		# input from H264 file
 		fifo = livebox.util.FIFO()
-		self.streamer.start(fifo.filename,self.control)
+		filename = "/Users/davidthorpe/Downloads/sample_iPod.m4v"
 		logging.info("RUNNING resolution=%s fps=%s bitrate=%s quality=%s audio=%s" % (self.control.resolution,self.control.framerate,self.control.bitrate,self.control.quality,self.control.audio))
+		self.streamer.start(filename,self.control)
+		while self.running:
+			time.sleep(1.0)
+		logging.info("STOPPING")
+		fifo.close()
 		return 0
 
 ################################################################################

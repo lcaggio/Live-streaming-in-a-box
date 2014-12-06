@@ -4,6 +4,9 @@
    <FileRef
       location = "group:README.md">
    </FileRef>
+   <FileRef
+      location = "group:NOTES.md">
+   </FileRef>
    <Group
       location = "group:src"
       name = "src">
