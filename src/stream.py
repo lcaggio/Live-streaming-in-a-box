@@ -93,7 +93,7 @@ class Application(object):
 
 	def run(self):
 		fifo = livebox.util.FIFO()
-		filename = "/Users/davidthorpe/Downloads/sample_iPod.m4v"
+		filename = "/Users/davidthorpe/Projects/Live-streaming-in-a-box/etc/test_360p.h264"
 		logging.info("RUNNING resolution=%s fps=%s bitrate=%s quality=%s audio=%s" % (self.control.resolution,self.control.framerate,self.control.bitrate,self.control.quality,self.control.audio))
 		self.streamer.start(filename,self.control)
 		while self.running:

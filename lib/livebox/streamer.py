@@ -46,15 +46,14 @@ class Streamer(object):
 			return False
 	running = property(get_running)
 	
-	
 	""" Private methods """
 	def _ffmpeg_output(self,process):
-		logging.debug("_ffmpeg_output started")
 		line = process.stderr.readline()
 		while line:
 			m = re.match(r"\s*frame=\s*(\S+)\s+fps=\s*(\S+)\s+q=(\S+)\s+size=\s*(\S+)\s+time=\s*(\S*)\s+bitrate=\s*(\S*)",line)
 			if m:
-				self._queue.put_nowait({
+				self._queue.put({
+					"stderr": line,
 					"frame": long(m.group(1)),
 					"fps": float(m.group(2)),
 					"q": float(m.group(3)),
@@ -62,8 +61,13 @@ class Streamer(object):
 					"time": m.group(5),
 					"bitrate": m.group(6)
 				})
+			else:
+				self._queue.put_nowait({
+					"stderr": line
+				})
 			line = process.stderr.readline()
-		logging.debug("_ffmpeg_output terminating")
+		""" Add in a terminating value to indicate the end of the queue """
+		self._queue.put(None)
 
 	def _ffmpeg_start(self,*flags):
 		logging.debug("execute: %s %s" % (self._ffmpeg," ".join(flags)))
@@ -71,7 +75,6 @@ class Streamer(object):
 			"%s %s" % (self._ffmpeg," ".join(flags)),
 			shell=True,
 			universal_newlines=True,
-			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE
 		)
 		stderr_thread = threading.Thread(target=self._ffmpeg_output,args=(proc,))
@@ -79,17 +82,18 @@ class Streamer(object):
 		stderr_thread.start()
 		
 		# wait for subprocess to complete
-		logging.debug("STARTING FFMPEG")
-		while not proc.poll():
+		while True:
 			try:
 				item = self._queue.get(True,1.0)
+				if not item: break
 				logging.debug("Status: %s" % item)
 			except Queue.Empty:
 				pass
-
+		
 		returncode = proc.poll()
 		logging.debug("COMPLETED FFMPEG, return code %s" % returncode)
-		return returncode	
+		self.input = None
+		return returncode
 
 	def _flags_input_audio(self,control):
 		assert isinstance(control,Control)
@@ -133,7 +137,8 @@ class Streamer(object):
 		t.start()
 	
 	def stop(self):
-		self.input = None
+		# TODO: Send signal 2 to ffmpeg
+		pass
 
 	def stream(self,filename=None,framerate=None,bitrate=None,url=None):
 		assert isinstance(filename,basestring) and filename
