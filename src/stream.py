@@ -120,7 +120,7 @@ def main(argv):
 		control = livebox.Control()
 		try:
 			control.url = argv[1]
-			for key in ('resolution','framerate','bitrate','audio','quality','hflip','vflip'):
+			for key in ('resolution','framerate','bitrate','audio','video','quality','hflip','vflip'):
 				value = getattr(FLAGS,key)
 				setattr(control,key,value)
 		except ValueError, e:

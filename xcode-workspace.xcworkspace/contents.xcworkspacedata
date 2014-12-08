@@ -31,10 +31,10 @@
          location = "group:livebox"
          name = "livebox">
          <FileRef
-            location = "group:input.py">
+            location = "group:streamer.py">
          </FileRef>
          <FileRef
-            location = "group:streamer.py">
+            location = "group:input.py">
          </FileRef>
          <FileRef
             location = "group:api.py">

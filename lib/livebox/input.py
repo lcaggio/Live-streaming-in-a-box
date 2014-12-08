@@ -25,30 +25,79 @@ class Error(Exception):
 
 ################################################################################
 
-class Camera(object):
-	def __init__(self):
-		self._output = None
-		self._camera = None
+class Base(object):
+
+	""" Constructor """
+	def __init__(self,filename,control):
+		assert isinstance(filename,basestring) and filename
+		assert os.path.exists(filename)
+		assert isinstance(control,Control)
+		self._control = control
+		self._filehandle = None
+		self.filename = filename
 
 	""" Properties """
-	def set_output(self,value):
+	def set_filename(self,value):
 		assert value==None or isinstance(value,basestring) and value
-		if self._output:
-			self._output.close()
+		if self._filehandle:
+			self._filehandle.close()
 		if value==None:
-			self._output = None
+			self._filename = None
+			self._filehandle = None
 		else:
-			self._output = io.open(value,"wb",buffering=65536)
-	def get_output(self):
-		return self._output
-	output = property(get_output,set_output)
+			self._filehandle = io.open(value,"wb",buffering=65536)
+			self._filename = value
+	def get_filename(self):
+		return self._filename
+	filename = property(get_filename,set_filename)
+
+	def get_filehandle(self):
+		return self._filehandle
+	filehandle = property(get_filehandle)
 
 	def get_running(self):
-		if self._output:
+		if self._filehandle:
 			return True
 		else:
 			return False
 	running = property(get_running)
+
+	def get_control(self):
+		return self._control
+	control = property(get_control)
+
+	def get_streamer_flags(self):
+		return [ ]
+	streamer_flags = property(get_streamer_flags)
+
+	""" Methods """
+	def start(self):
+		logging.error("start: Not implemented")
+
+	def stop(self):
+		logging.error("stop: Not implemented")
+
+################################################################################
+
+class File(Base):
+
+	""" Properties """
+	def get_streamer_flags(self):
+		return [ "-re","-f %s" % constants.CAMERA_FORMAT,"-r %s" % self.control.framerate,"-i \"%s\"" % self.filename ]
+	streamer_flags = property(get_streamer_flags)
+
+
+################################################################################
+
+class Camera(Base):
+	def __init__(self,*args):
+		Base.__init__(self,*args)
+		self._camera = None
+
+	""" Properties """
+	def get_streamer_flags(self):
+		return [ "-re","-f %s" % constants.CAMERA_FORMAT,"-r %s" % self.control.framerate,"-i \"%s\"" % self.filename ]
+	streamer_flags = property(get_streamer_flags)
 	
 	""" Private methods """
 	def _camera_init(self):
@@ -62,11 +111,7 @@ class Camera(object):
 			raise Error("%s" % e)
 
 	""" Methods """
-	def start(self,filename,control):
-		assert isinstance(filename,basestring) and filename
-		assert os.path.exists(filename)
-		assert isinstance(control,Control)
-
+	def start(self):
 		""" Get parameters """
 		if self.running:
 			raise Error("Internal error: Invalid state")
@@ -74,21 +119,18 @@ class Camera(object):
 		# Initialize camera
 		self._camera_init()
 
-		# Open output file
-		self.output = filename
-
 		# Start camera output
-		self._camera.resolution = util.get_framesize_for_resolution(control.resolution)
-		self._camera.framerate = control.framerate
-		self._camera.hflip = control.hflip
-		self._camera.vflip = control.vflip
+		self._camera.resolution = util.get_framesize_for_resolution(self.control.resolution)
+		self._camera.framerate = self.control.framerate
+		self._camera.hflip = self.control.hflip
+		self._camera.vflip = self.control.vflip
 		self._camera.start_recording(
-			self.output,
+			self.filehandle,
 			format=constants.CAMERA_FORMAT,
 			profile=constants.CAMERA_PROFILE,
-			quality=control.quality,
-			bitrate=control.bitrate,
-			intra_period=(2*control.framerate),
+			quality=self.control.quality,
+			bitrate=self.control.bitrate,
+			intra_period=(2 * self.control.framerate),
 			inline_headers=True
 		)
 #		camera.wait_recording(timeout=3600 * 10)
@@ -101,5 +143,6 @@ class Camera(object):
 			self._camera.stop_recording()
 		except picamera.exc.PiCameraNotRecording:
 			raise Error("Internal error: Invalid state")
-		self.output = None
+		self.filename = None
+
 

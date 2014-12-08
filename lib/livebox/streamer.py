@@ -32,7 +32,7 @@ class Streamer(object):
 	
 	""" Properties """
 	def set_input(self,value):
-		assert value==None or isinstance(value,basestring) and value
+		assert value==None or isinstance(value,livebox.input.Base) and value
 		if value==None:
 			self._input = None
 		else:
@@ -81,7 +81,7 @@ class Streamer(object):
 		""" Add in a terminating value to indicate the end of the queue """
 		self._queue.put(None)
 
-	def _ffmpeg_start(self,*flags):
+	def _ffmpeg_thread(self,*flags):
 		logging.debug("execute: %s %s" % (self._ffmpeg," ".join(flags)))
 		proc = subprocess.Popen(
 			"%s %s" % (self._ffmpeg," ".join(flags)),
@@ -123,10 +123,6 @@ class Streamer(object):
 		assert isinstance(control,Control)
 		return util.get_flags_for_audio(control.audio)
 
-	def _flags_input_video(self,control):
-		assert isinstance(control,Control)
-		return [ "-re","-f %s" % constants.CAMERA_FORMAT,"-r %s" % control.framerate,"-i \"%s\"" % self._input ]
-
 	def _flags_output(self,control):
 		assert isinstance(control,Control)
 		return [
@@ -135,12 +131,12 @@ class Streamer(object):
 			"-f flv"
 		]
 	
-	def _get_video_input(self,control):
+	def _get_video_input(self,filename,control):
 		assert isinstance(control,Control)
 		if control.video=="picamera":
-			return livebox.input.Camera(control)
+			return livebox.input.Camera(filename,control)
 		if control.video=="file":
-			return livebox.input.File(control)
+			return livebox.input.File(filename,control)
 		raise Error("Invalid video input method")
 
 	def start(self,filename,control):
@@ -164,8 +160,8 @@ class Streamer(object):
 		flags.extend(self._flags_output(control))
 		flags.append(control.url)
 	
-		# create background thread to start streaming
-		t = threading.Thread(target=self._ffmpeg_start,args=flags)
+		# create background thread to stream
+		t = threading.Thread(target=self._ffmpeg_thread,args=flags)
 		t.daemon = True
 		t.start()
 	
@@ -173,24 +169,3 @@ class Streamer(object):
 		# TODO: Send signal 2 to ffmpeg
 		pass
 
-#	def stream(self,filename=None,framerate=None,bitrate=None,url=None):
-#		assert isinstance(filename,basestring) and filename
-#		assert os.path.exists(filename)
-#		assert isinstance(framerate,(int,long)) and framerate > 0
-#		assert isinstance(bitrate,(int,long)) and bitrate > 0
-#		assert isinstance(url,basestring) and url
-#		flags.extend()
-#		flags.append(url)
-#		# open the subprocess
-#		ffmpeg = [ self._ffmpeg ]
-#		ffmpeg.extend(flags)
-#		
-#		# run the process, and in the background, read the status from stderr
-#		logging.debug("Streamer.stream: execute: %s" % " ".join(ffmpeg))
-#
-#  -f h264  -r ${FPS} -i "${FIFO_FILE}" \
-#  -re \
-#  -f lavfi -i "sine=frequency=1000:duration=0" \
-#  -c:v copy -b:v ${KBPS}k -c:a aac -b:a 64k \
-#  -map 0:0 -map 1:0  -strict experimental \
-#  -f flv "${STREAM_URL}"
