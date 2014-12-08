@@ -9,8 +9,8 @@ import cgi
 
 # local imports
 import webserver
-import camera,streamer,constants,util
-from . import Control
+import streamer,constants,util
+import livebox.Control
 
 ################################################################################
 
@@ -127,12 +127,11 @@ class APIServer(webserver.Server):
 		webserver.Server.__init__(self,*args,request_class=APIRequest)
 		self.control = Control()
 		self.fifo = util.FIFO()
-		self.camera = camera.Camera()
 		self.streamer = streamer.Streamer(ffmpeg)
 
 	""" Properties """
 	def get_state(self):
-		if not self.camera.running and not self.streamer.running:
+		if not self.streamer.running:
 			return "idle"
 		else:
 			return "running"
@@ -148,15 +147,13 @@ class APIServer(webserver.Server):
 	def streamer_start(self):
 		try:
 			self.streamer.start(self.fifo.filename,self.control)
-			self.camera.start(self.fifo.filename,self.control)
-		except (camera.Error,streamer.Error), e:
+		except streamer.Error, e:
 			raise webserver.Error("streamer_start: %s" % e,webserver.HTTP_STATUS_SERVERERROR)
 
 	def streamer_stop(self):
 		try:
 			self.streamer.stop()
-			self.camera.stop()
-		except (camera.Error,streamer.Error), e:
+		except streamer.Error, e:
 			raise webserver.Error("streamer_stop: %s" % e,webserver.HTTP_STATUS_SERVERERROR)
 
 

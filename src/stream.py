@@ -48,7 +48,7 @@ import logging,pprint,signal,time
 import gflags
 
 # Local imports
-import livebox,livebox.camera,livebox.streamer,livebox.util
+import livebox,livebox.streamer,livebox.util
 
 ################################################################################
 # command line flags
@@ -59,6 +59,7 @@ gflags.DEFINE_string('resolution',livebox.constants.CAMERA_RESOLUTION[0][0],"Cam
 gflags.DEFINE_integer('framerate',livebox.constants.CAMERA_FRAMERATE,"Frames per second")
 gflags.DEFINE_string('bitrate',None,"Video bitrate")
 gflags.DEFINE_string('audio',livebox.constants.STREAMER_AUDIO[0][0],"Audio channel content")
+gflags.DEFINE_string('video',livebox.constants.STREAMER_VIDEO[0][0],"Video channel content")
 gflags.DEFINE_integer('quality',livebox.constants.CAMERA_QUALITY,"Camera quality parameter")
 gflags.DEFINE_boolean('hflip',False,"Horizonal image flip")
 gflags.DEFINE_boolean('vflip',False,"Vertical image flip")
@@ -71,36 +72,32 @@ class Application(object):
 	def __init__(self,control,ffmpeg=None):
 		assert isinstance(control,livebox.Control)
 
-		# set camera and streamer objects
+		# set streamer objects
 		self.control = control
-		self.camera = livebox.camera.Camera()
 		self.streamer = livebox.streamer.Streamer(ffmpeg)
 
 		# set signal handlers
 		signal.signal(signal.SIGINT,self.signal_handler)
 		signal.signal(signal.SIGTERM,self.signal_handler)
 
-	""" Properties """
-	@property
-	def running(self):
-		if self.streamer.running:
-			return True
-		return False
-
+	""" Methods """
 	def signal_handler(self,num,stack):
 		logging.debug("Caught signal %d" % num)
 		self.streamer.stop()
 
 	def run(self):
 		fifo = livebox.util.FIFO()
-		filename = "/Users/davidthorpe/Projects/Live-streaming-in-a-box/etc/test_360p.h264"
+		filename = fifo.filename
 		logging.info("RUNNING resolution=%s fps=%s bitrate=%s quality=%s audio=%s" % (self.control.resolution,self.control.framerate,self.control.bitrate,self.control.quality,self.control.audio))
 		self.streamer.start(filename,self.control)
-		while self.running:
-			time.sleep(1.0)
-		logging.info("STOPPING")
+		while self.streamer.running:
+			time.sleep(0.5)
 		fifo.close()
-		return 0
+
+		returnvalue = self.streamer.returnvalue
+
+		logging.info("STOPPED, returncode = %s" % str(returnvalue))
+		return self.streamer.returnvalue
 
 ################################################################################
 # main method
@@ -133,10 +130,12 @@ def main(argv):
 
 		# Run application
 		application = Application(control,ffmpeg=FLAGS.ffmpeg)
-		return_value = application.run()
 
-		# Exit
-		sys.exit(return_value)
+		# Deal with the return value
+		(returncode,status) = application.run()
+		if returncode:
+			logging.error(status)
+		sys.exit(returncode)
 	except gflags.FlagsError, e:
 		print "Usage error: %s" % e
 		sys.exit(-1)

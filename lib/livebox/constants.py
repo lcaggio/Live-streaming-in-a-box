@@ -31,6 +31,7 @@ STREAMER_URL_SCHEMES = ("rtmp",)
 STREAMER_EXEC = "bin/ffmpeg"
 STREAMER_VIDEO = (
 	("picamera",None),
+	("file",None)
 )
 STREAMER_AUDIO = (
 	("1kHz","-f lavfi","-i \"sine=frequency=1000:duration=0\""),

@@ -12,6 +12,7 @@ import os,logging, subprocess, threading, Queue, time, re
 
 # Local imports
 from . import util,constants,Control
+import livebox.input
 
 ################################################################################
 
@@ -25,8 +26,9 @@ class Streamer(object):
 		assert isinstance(ffmpeg,basestring) and ffmpeg
 		assert os.path.exists(ffmpeg) and os.path.isfile(ffmpeg)
 		self._ffmpeg = ffmpeg
-		self._input = None
 		self._queue = Queue.Queue()
+		self.input = None
+		self.returnvalue = None
 	
 	""" Properties """
 	def set_input(self,value):
@@ -45,7 +47,17 @@ class Streamer(object):
 		else:
 			return False
 	running = property(get_running)
-	
+
+	def set_returnvalue(self,value):
+		assert value==None or isinstance(value,tuple)
+		if value==None:
+			self._returnvalue = (None,None)
+		else:
+			self._returnvalue = value
+	def get_returnvalue(self):
+		return self._returnvalue
+	returnvalue = property(get_returnvalue,set_returnvalue)
+
 	""" Private methods """
 	def _ffmpeg_output(self,process):
 		line = process.stderr.readline()
@@ -53,7 +65,7 @@ class Streamer(object):
 			m = re.match(r"\s*frame=\s*(\S+)\s+fps=\s*(\S+)\s+q=(\S+)\s+size=\s*(\S+)\s+time=\s*(\S*)\s+bitrate=\s*(\S*)",line)
 			if m:
 				self._queue.put({
-					"stderr": line,
+					"stderr": line.strip(),
 					"frame": long(m.group(1)),
 					"fps": float(m.group(2)),
 					"q": float(m.group(3)),
@@ -63,7 +75,7 @@ class Streamer(object):
 				})
 			else:
 				self._queue.put_nowait({
-					"stderr": line
+					"stderr": line.strip()
 				})
 			line = process.stderr.readline()
 		""" Add in a terminating value to indicate the end of the queue """
@@ -82,18 +94,30 @@ class Streamer(object):
 		stderr_thread.start()
 		
 		# wait for subprocess to complete
+		status = None
 		while True:
 			try:
-				item = self._queue.get(True,1.0)
+				""" Get queue item, break after 500ms """
+				item = self._queue.get(True,0.5)
+				""" If empty item, then break out of the loop """
 				if not item: break
+
+				""" Set status """
+				if isinstance(item,dict):
+					status = item.get("stderr")
+
+				""" Debug """
 				logging.debug("Status: %s" % item)
+
 			except Queue.Empty:
 				pass
-		
+	
 		returncode = proc.poll()
-		logging.debug("COMPLETED FFMPEG, return code %s" % returncode)
+		if returncode:
+			self.returnvalue = (returncode,status)
+		else:
+			self.returnvalue = (returncode,None)
 		self.input = None
-		return returncode
 
 	def _flags_input_audio(self,control):
 		assert isinstance(control,Control)
@@ -110,6 +134,14 @@ class Streamer(object):
 			"-map 0:0","-map 1:0","-strict experimental",
 			"-f flv"
 		]
+	
+	def _get_video_input(self,control):
+		assert isinstance(control,Control)
+		if control.video=="picamera":
+			return livebox.input.Camera(control)
+		if control.video=="file":
+			return livebox.input.File(control)
+		raise Error("Invalid video input method")
 
 	def start(self,filename,control):
 		assert isinstance(filename,basestring) and filename
@@ -122,9 +154,10 @@ class Streamer(object):
 		if not control.url:
 			raise Error("Invalid URL: %s" % control.url)
 		
-		# Open input file
-		self.input = filename
-	
+		# Open input source
+		self.input = self._get_video_input(filename,control)
+
+		# Flags for streamer
 		flags = [ ]
 		flags.extend(self._flags_input_video(control))
 		flags.extend(self._flags_input_audio(control))
@@ -140,23 +173,21 @@ class Streamer(object):
 		# TODO: Send signal 2 to ffmpeg
 		pass
 
-	def stream(self,filename=None,framerate=None,bitrate=None,url=None):
-		assert isinstance(filename,basestring) and filename
-		assert os.path.exists(filename)
-		assert isinstance(framerate,(int,long)) and framerate > 0
-		assert isinstance(bitrate,(int,long)) and bitrate > 0
-		assert isinstance(url,basestring) and url
-		flags.extend()
-		flags.append(url)
-		# open the subprocess
-		ffmpeg = [ self._ffmpeg ]
-		ffmpeg.extend(flags)
-		
-		# run the process, and in the background, read the status from stderr
-		logging.debug("Streamer.stream: execute: %s" % " ".join(ffmpeg))
-
-
-	
+#	def stream(self,filename=None,framerate=None,bitrate=None,url=None):
+#		assert isinstance(filename,basestring) and filename
+#		assert os.path.exists(filename)
+#		assert isinstance(framerate,(int,long)) and framerate > 0
+#		assert isinstance(bitrate,(int,long)) and bitrate > 0
+#		assert isinstance(url,basestring) and url
+#		flags.extend()
+#		flags.append(url)
+#		# open the subprocess
+#		ffmpeg = [ self._ffmpeg ]
+#		ffmpeg.extend(flags)
+#		
+#		# run the process, and in the background, read the status from stderr
+#		logging.debug("Streamer.stream: execute: %s" % " ".join(ffmpeg))
+#
 #  -f h264  -r ${FPS} -i "${FIFO_FILE}" \
 #  -re \
 #  -f lavfi -i "sine=frequency=1000:duration=0" \
