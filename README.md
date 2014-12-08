@@ -88,7 +88,7 @@ follows:
     interfaces. By setting this to `localhost` you can ensure that only 
 	processes on the device itself can send API commands.
 	
-  * `--wwwdocs <folder>` You can set a custom folder to use as the static files
+  * `--docroot <folder>` You can set a custom folder to use as the static files
     that can be served by the server. In general, you won't want to set this.
 	
   * `--ffmpeg <exec>` Optional. You can set the ffmpeg binary to be used for 
